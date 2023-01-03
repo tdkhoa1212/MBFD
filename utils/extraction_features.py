@@ -62,6 +62,8 @@ def PSD_FFT(x):
 
 def extracted_feature_of_signal(signals):
   data = []
+  if len(signals) != 2:
+    signals = np.squeeze(signals)
   for signal in signals:
     features = [RMS(signal), Variance(signal), Peak_value(signal), Crest_factor(signal), \
                 Kurtosis(signal), Clearance_factor(signal), Impulse_factor(signal),  \

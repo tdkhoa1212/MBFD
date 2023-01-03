@@ -16,12 +16,21 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from lightgbm import LGBMClassifier
 
+def scale_test(test_signals, scale):
+  data = []
+  for signal in test_signals:
+    signal = np.expand_dims(signal, axis=-1)
+    data.append(np.squeeze(scale.transform(signal)).tolist())
+  return np.array(data)
 
 def scaler_fit(train_signals, opt):
     '''
     train_signals: a matrix 
     scaler_method: name of scaler method
     '''
+    shape = train_signals.shape
+    train_signals = train_signals.reshape(-1, )
+    train_signals = np.expand_dims(train_signals, -1)
     if opt.scaler == 'MinMaxScaler':
       scaler = MinMaxScaler()
     if opt.scaler == 'MaxAbsScaler':
@@ -39,6 +48,7 @@ def scaler_fit(train_signals, opt):
     print('\n' + 10*'-' + f'{opt.scaler}' + 10*'-' + '\n')
     scale = scaler.fit(train_signals)
     train_data = scale.transform(train_signals)
+    train_data = train_data.reshape(shape)
     return train_data, scale
 
 def ML_models(X_train, y_train, X_test, y_test opt):
@@ -88,6 +98,19 @@ def load_PU_data(path, opt):
     each_data = i[:min_l].tolist()
     data.append(each_data)
   return np.array(data)
+
+def load_table_10(path):
+  all_data = []
+  for name in os.listdir(path):
+    each_path = os.path.join(path, name)
+    each_data = np.expand_dims(np.load(each_path)[:255900], axis=0)
+    if all_data == []:
+      all_data = each_data
+    else:
+      all_data = np.concatenate((all_data, each_data))
+      
+  # all_data = scale_data(all_data, 2)
+  return np.expand_dims(all_data, axis=0)
 
     
     
