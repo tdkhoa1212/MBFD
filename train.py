@@ -10,6 +10,7 @@ def parse_opt(known=False):
     parser.add_argument('--ML_method', default='SVM' , type=str, help='SVM, RF, KNN, LGBM')
     parser.add_argument('--scaler', default='MinMaxScaler', type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
     parser.add_argument('--type_PU_data', type=str, default='vibration', help='vibration, MCS1, MCS2')
+    parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data', help='direction of data')
     parser.add_argument('--PU_table_8', default=True, type=bool)
     parser.add_argument('--PU_table_10', default=True, type=bool)
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
