@@ -1,33 +1,34 @@
 import numpy as np
+from os.path import join
 from utils.tools import load_PU_data
 
-def load_PU_table(opt)
+def load_PU_table(opt):
     if opt.PU_table_8:
         print('\nLoad Training ---------------------------------------------\n')
-        K002 = load_PU_data(opt.data_dir + 'K002', type_data=opt.type_PU_data)
+        K002 = load_PU_data(join(opt.data_dir, 'K002'), opt)
         
-        KA01 = load_PU_data(opt.data_dir + 'KA01', type_data=opt.type_PU_data)
-        KA05 = load_PU_data(opt.data_dir + 'KA05', type_data=opt.type_PU_data)
-        KA07 = load_PU_data(opt.data_dir + 'KA07', type_data=opt.type_PU_data)
+        KA01 = load_PU_data(join(opt.data_dir, 'KA01'), opt)
+        KA05 = load_PU_data(join(opt.data_dir, 'KA05'), opt)
+        KA07 = load_PU_data(join(opt.data_dir, 'KA07'), opt)
 
-        KI01 = load_PU_data(opt.data_dir + 'KI01', type_data=opt.type_PU_data)
-        KI05 = load_PU_data(opt.data_dir + 'KI05', type_data=opt.type_PU_data)
-        KI07 = load_PU_data(opt.data_dir + 'KI07', type_data=opt.type_PU_data)
+        KI01 = load_PU_data(join(opt.data_dir, 'KI01'), opt)
+        KI05 = load_PU_data(join(opt.data_dir, 'KI05'), opt)
+        KI07 = load_PU_data(join(opt.data_dir, 'KI07'), opt)
 
         print('Load Testing---------------------------------------------\n')
-        K001 = load_PU_data(opt.data_dir + 'K001', type_data=opt.type_PU_data)
+        K001 = load_PU_data(join(opt.data_dir, 'K001'), opt)
         
-        KA22 = load_PU_data(opt.data_dir + 'KA22', type_data=opt.type_PU_data)
-        KA04 = load_PU_data(opt.data_dir + 'KA04', type_data=opt.type_PU_data)
-        KA15 = load_PU_data(opt.data_dir + 'KA15', type_data=opt.type_PU_data)
-        KA30 = load_PU_data(opt.data_dir + 'KA30', type_data=opt.type_PU_data)
-        KA16 = load_PU_data(opt.data_dir + 'KA16', type_data=opt.type_PU_data)
+        KA22 = load_PU_data(join(opt.data_dir, 'KA22'), opt)
+        KA04 = load_PU_data(join(opt.data_dir, 'KA04'), opt)
+        KA15 = load_PU_data(join(opt.data_dir, 'KA15'), opt)
+        KA30 = load_PU_data(join(opt.data_dir, 'KA30'), opt)
+        KA16 = load_PU_data(join(opt.data_dir, 'KA16'), opt)
 
-        KI14 = load_PU_data(opt.data_dir + 'KI14', type_data=opt.type_PU_data)
-        KI21 = load_PU_data(opt.data_dir + 'KI21', type_data=opt.type_PU_data)
-        KI17 = load_PU_data(opt.data_dir + 'KI17', type_data=opt.type_PU_data)
-        KI18 = load_PU_data(opt.data_dir + 'KI18', type_data=opt.type_PU_data)
-        KI16 = load_PU_data(opt.data_dir + 'KI16', type_data=opt.type_PU_data)
+        KI14 = load_PU_data(join(opt.data_dir, 'KI14'), opt)
+        KI21 = load_PU_data(join(opt.data_dir, 'KI21'), opt)
+        KI17 = load_PU_data(join(opt.data_dir, 'KI17'), opt)
+        KI18 = load_PU_data(join(opt.data_dir, 'KI18'), opt)
+        KI16 = load_PU_data(join(opt.data_dir, 'KI16'), opt)
         
         print('Load all---------------------------------------------\n')
         min_ = np.min((K002.shape[1], KA01.shape[1], KA07.shape[1], KI01.shape[1], KI05.shape[1], KI07.shape[1],\

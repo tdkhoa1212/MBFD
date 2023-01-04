@@ -1,4 +1,7 @@
 import numpy as np
+import os
+import scipy.io
+from os.path import join
 from sklearn.metrics import accuracy_score
 
 # ----------------------------------------------------Scaler methods----------------------------------------------------
@@ -51,7 +54,7 @@ def scaler_fit(train_signals, opt):
     train_data = train_data.reshape(shape)
     return train_data, scale
 
-def ML_models(X_train, y_train, X_test, y_test opt):
+def ML_models(X_train, y_train, X_test, y_test, opt):
     '''
     X_train, X_test: matrices
     y_train, y_test: matrices (onehot)
@@ -75,7 +78,7 @@ def load_PU_data(path, opt):
   min_l = 0
   for name in os.listdir(path):
     if name.split('.')[-1] == 'mat':
-      path_signal = path + '/' + name
+      path_signal = join(path, name)
       file_name = path_signal.split('/')[-1]
       name = file_name.split('.')[0]
       signal = scipy.io.loadmat(path_signal)[name]
