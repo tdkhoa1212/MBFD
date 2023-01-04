@@ -24,7 +24,6 @@ def U_SDLM(input, opt):
             bias_regularizer=regularizers.l2(1e-4),
             activity_regularizer=regularizers.l2(1e-5))(x)
   x = Dropout(rate=0.5)(x)
-  # x = concatenate([x, in_], axis=-1)
   x = Dense(opt.embedding_size)(x)
   x = BatchNormalization()(x)
   x = Activation('relu')(x)
