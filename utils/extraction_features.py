@@ -635,3 +635,17 @@ class AudioFeatureExtractor:
 
     def inverse_mfcc_to_audio(self, mfcc):
         pass
+
+def handcrafted_features(signals):
+    data = []
+    afe = AudioFeatureExtractor(400, 200, 1) # 22050, 1024, 4
+    for i in signals:
+        extract_rms = afe.extract_rms(i)
+        extract_spectral_centroid  = afe.extract_spectral_centroid(i)
+        extract_spectral_bandwidth = afe.extract_spectral_bandwidth(i)
+        extract_spectral_flatness  = afe.extract_spectral_flatness(i)
+        extract_spectral_rolloff   = afe.extract_spectral_rolloff(i)
+        all_i = np.concatenate((extract_rms, extract_spectral_centroid, extract_spectral_bandwidth, extract_spectral_flatness, extract_spectral_rolloff), axis=1)
+        all_i = all_i.flatten()  # convert the vectors of 400 samples to the vectors of 45 samples
+        data.append(all_i)
+    return np.array(data)
