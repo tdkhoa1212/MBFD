@@ -13,8 +13,8 @@ def parse_opt(known=False):
     parser.add_argument('--type_data', type=str, default='vibration', help='vibration, MCS1, MCS2')
     parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data', help='direction of data')
     parser.add_argument('--weights_path', type=str, default='/content/drive/MyDrive/Khoa/vibration_project/Classification/results', help='direction of data')
-    parser.add_argument('--load_ưeight', default=False, type=bool)
-    parser.add_argument('--Ex_feature', type=str, default='time', help='time, fre, time_fre')
+    parser.add_argument('--load_weight', default=False, type=bool)
+    parser.add_argument('--Ex_feature', type=str, default='fre', help='time, fre, time_fre')
     parser.add_argument('--PU_table_8', default=True, type=bool)
     parser.add_argument('--PU_table_10', default=False, type=bool)
 

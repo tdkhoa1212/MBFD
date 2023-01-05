@@ -70,23 +70,28 @@ def train_model(X_train, y_train, X_test, y_test, opt):
         e_a_data = extracted_feature_of_signal(np.squeeze(a_data))
         e_p_data = extracted_feature_of_signal(np.aqueeze(p_data))
         e_n_data = extracted_feature_of_signal(np.aqueeze(n_data))
+        X_train_e = extracted_feature_of_signal(np.squeeze(X_train))
 
-        x_train_e = 
     if opt.Ex_feature == 'fre':
         e_a_data = handcrafted_features(np.squeeze(a_data))
         e_p_data = handcrafted_features(np.aqueeze(p_data))
         e_n_data = handcrafted_features(np.aqueeze(n_data))
+        X_train_e = handcrafted_features(np.squeeze(X_train))
+
     if opt.Ex_feature == 'time_fre':
-        a_time = extracted_feature_of_signal(np.squeeze(a_data))
-        p_time = extracted_feature_of_signal(np.aqueeze(p_data))
-        n_time = extracted_feature_of_signal(np.aqueeze(n_data))
-        a_fre = handcrafted_features(np.squeeze(a_data))
-        p_fre = handcrafted_features(np.aqueeze(p_data))
-        n_fre = handcrafted_features(np.aqueeze(n_data))
+        a_time   = extracted_feature_of_signal(np.squeeze(a_data))
+        p_time   = extracted_feature_of_signal(np.aqueeze(p_data))
+        n_time   = extracted_feature_of_signal(np.aqueeze(n_data))
+        X_time_e = extracted_feature_of_signal(np.squeeze(X_train))
+        a_fre   = handcrafted_features(np.squeeze(a_data))
+        p_fre   = handcrafted_features(np.aqueeze(p_data))
+        n_fre   = handcrafted_features(np.aqueeze(n_data))
+        X_fre_e = handcrafted_features(np.squeeze(X_train))
 
         e_a_data = np.concatenate((a_time, a_fre), axis=-1)
         e_p_data = np.concatenate((p_time, p_fre), axis=-1)
         e_n_data = np.concatenate((n_time, n_fre), axis=-1)
+        X_train_e = np.concatenate((X_time_e, X_fre_e), axis=-1)
 
     a_label = one_hot(y_train[:, 0])
     p_label = one_hot(y_train[:, 1])
@@ -131,4 +136,5 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     
     from TSNE_plot import tsne_plot
     tsne_plot(outdir, 'original', X_train_embed[:, :opt.embedding_size], X_test_embed[:, :opt.embedding_size], y_train, y_test)
-    tsne_plot(outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], X_test_embed[:, opt.embedding_size: ], y_train, y_test)
+    tsne_plot(outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], 
+    [:, opt.embedding_size: ], y_train, y_test)

@@ -1,4 +1,5 @@
 from keras.layers import Dense
+import tensorflow.keras.backend as K
 from tensorflow.keras.layers import BatchNormalization, Dropout, Activation
 
 
@@ -27,4 +28,5 @@ def U_SDLM(input, opt):
   x = Dense(opt.embedding_size)(x)
   x = BatchNormalization()(x)
   x = Activation('relu')(x)
+  x = Lambda(lambda  x: K.l2_normalize(x, axis=1))(x)
   return x
