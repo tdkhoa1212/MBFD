@@ -38,8 +38,9 @@ def train(opt):
     print(f'Shape of present test data: {X_test.shape, y_test.shape}' + '\n')
 
     # Scale data----------------------------------------
-    X_train, scale = scaler_fit(X_train, opt)
-    X_test = scale_test(X_test, scale)
+    if opt.scaler != 'None':
+        X_train, scale = scaler_fit(X_train, opt)
+        X_test = scale_test(X_test, scale)
 
     # ML model------------------------------------------
     ML_models(X_train, y_train, X_test, y_test, opt)
