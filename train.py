@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 from utils.PU import load_PU_table
-from utils.tools import scaler_fit, ML_models, scale_test, load_PU_data
+from utils.tools import scaler_fit, ML_models, scale_test
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 
 def parse_opt(known=False):
@@ -12,9 +12,14 @@ def parse_opt(known=False):
     parser.add_argument('--scaler', default='MinMaxScaler', type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
     parser.add_argument('--type_data', type=str, default='vibration', help='vibration, MCS1, MCS2')
     parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data', help='direction of data')
+    parser.add_argument('--weights_path', type=str, default='/content/drive/MyDrive/Khoa/vibration_project/Classification/results', help='direction of data')
+    parser.add_argument('--load_ưeight', default=False, type=bool)
     parser.add_argument('--Ex_feature', type=str, default='time', help='time, fre, time_fre')
     parser.add_argument('--PU_table_8', default=True, type=bool)
     parser.add_argument('--PU_table_10', default=False, type=bool)
+
+    parser.add_argument('--alpha', default=0.4, type=int)
+    parser.add_argument('--lambda_', default=0.3, type=int)
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 

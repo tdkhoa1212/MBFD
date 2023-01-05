@@ -106,6 +106,12 @@ def load_table_10(path):
       
   return np.expand_dims(all_data, axis=0)
 
+def one_hot(label):
+  n_class = np.max(label) + 1
+  new_label = np.zeros((len(label), n_class))
+  for idx, val in enumerate(label):
+    new_label[idx, val] = 1
+  return new_label
     
     
     

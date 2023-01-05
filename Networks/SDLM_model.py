@@ -63,7 +63,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = Activation('relu')(x)
     return x
 
-def SDLM(opt, input_, backbone=False):
+def SDLM(input, opt, backbone=False):
     '''
     The model was rebuilt based on the construction of resnet 34 and inherited from this source code:
     https://github.com/philipperemy/very-deep-convnets-raw-waveforms/blob/master/model_resnet.py
@@ -73,7 +73,7 @@ def SDLM(opt, input_, backbone=False):
                strides=4,
                padding='same',
                kernel_initializer='glorot_uniform',
-               kernel_regularizer=regularizers.l2(l=0.0001),)(input_)
+               kernel_regularizer=regularizers.l2(l=0.0001),)(input)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = MaxPooling1D(pool_size=4, strides=None)(x)
