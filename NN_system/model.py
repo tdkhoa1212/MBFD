@@ -136,5 +136,4 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     
     from TSNE_plot import tsne_plot
     tsne_plot(outdir, 'original', X_train_embed[:, :opt.embedding_size], X_test_embed[:, :opt.embedding_size], y_train, y_test)
-    tsne_plot(outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], 
-    [:, opt.embedding_size: ], y_train, y_test)
+    tsne_plot(outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], X_test_embed[:, opt.embedding_size: ], y_train, y_test)

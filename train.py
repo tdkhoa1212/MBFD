@@ -18,12 +18,16 @@ def parse_opt(known=False):
     parser.add_argument('--PU_table_8', default=True, type=bool)
     parser.add_argument('--PU_table_10', default=False, type=bool)
 
+    # Parameters--------
     parser.add_argument('--alpha', default=0.4, type=int)
     parser.add_argument('--lambda_', default=0.3, type=int)
+
+    # Mode-------
+    parser.add_argument('--table', type=str, default='table6', help='table6, table7')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
-def train(opt):
+def train_table6(opt):
     X_train, y_train, X_test, y_test = load_PU_table(opt)
     print('\n' + f'Shape of original training data: {X_train.shape, y_train.shape}')
     print(f'Shape of original test data: {X_test.shape, y_test.shape}' + '\n')
@@ -50,8 +54,11 @@ def train(opt):
     # ML model------------------------------------------
     ML_models(X_train, y_train, X_test, y_test, opt)
 
+def train_table7(opt):
 
 if __name__ == '__main__':
     opt = parse_opt()
-    train(opt)
-    
+    if opt.table == 'table6':
+        train_table6(opt)
+    if opt.table == 'table7':
+        train_table7(opt) 
