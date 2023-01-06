@@ -16,7 +16,7 @@ def parse_opt(known=False):
     parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data', help='direction of data')
     parser.add_argument('--weights_path', type=str, default='/content/drive/MyDrive/Khoa/vibration_project/Classification/results', help='direction of data')
     parser.add_argument('--img_outdir', type=str, default='/content/drive/MyDrive/Khoa/vibration_project/Classification/results/images', help='direction of data')
-    parser.add_argument('--load_weight', default=False, type=bool)
+    parser.add_argument('--load_weights', default=False, type=bool)
     parser.add_argument('--Ex_feature', type=str, default='fre', help='time, fre, time_fre')
     parser.add_argument('--PU_table_8', default=True, type=bool)
     parser.add_argument('--PU_table_10', default=False, type=bool)
@@ -27,6 +27,8 @@ def parse_opt(known=False):
     parser.add_argument('--embedding_size', default=256, type=int) 
     parser.add_argument('--input_shape', default=250604, type=int)  
     parser.add_argument('--num_classes', default=3, type=int) 
+    parser.add_argument('--batch_size', default=64, type=int) 
+    parser.add_argument('--epochs', default=60, type=int) 
     
     # Mode-------
     parser.add_argument('--table', type=str, default='table7', help='table6, table7')

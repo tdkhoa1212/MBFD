@@ -117,7 +117,7 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     # only use t_soft for softmax head in training process
     model.fit(x=[a_data, e_a_data, p_data, e_p_data, n_data, e_n_data, c_data], y=[t_soft, c_data],
               batch_size=opt.batch_size, 
-              epochs=opt.epoch, 
+              epochs=opt.epochs, 
               # callbacks=[callback], 
               shuffle=True)
 
