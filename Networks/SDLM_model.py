@@ -6,7 +6,7 @@ from tensorflow.keras import layers
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import Activation, BatchNormalization, \
                                     Conv1D, Dense, GlobalAveragePooling1D, \
-                                    MaxPooling1D, Lambda, concatenate
+                                    MaxPooling1D, Lambda, concatenate, Lambda
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
@@ -63,7 +63,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = Activation('relu')(x)
     return x
 
-def SDLM(input, opt, backbone=False):
+def SDLM(input_, opt, backbone=False):
     '''
     The model was rebuilt based on the construction of resnet 34 and inherited from this source code:
     https://github.com/philipperemy/very-deep-convnets-raw-waveforms/blob/master/model_resnet.py
@@ -73,26 +73,18 @@ def SDLM(input, opt, backbone=False):
                strides=4,
                padding='same',
                kernel_initializer='glorot_uniform',
-               kernel_regularizer=regularizers.l2(l=0.0001),)(input)
+               kernel_regularizer=regularizers.l2(l=0.0001),)(input_)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = MaxPooling1D(pool_size=4, strides=None)(x)
 
-    if opt.case_14 or opt.MFPT_data:
-      for i in range(2):
+    for i in range(4):
         x = identity_block(x, kernel_size=3, filters=48, stage=1, block=i)
-      x = MaxPooling1D(pool_size=4, strides=None)(x)
-      for i in range(2):
-        x = identity_block(x, kernel_size=3, filters=96, stage=2, block=i)
-      x = MaxPooling1D(pool_size=4, strides=None)(x)
-    else:
-      for i in range(4):
-          x = identity_block(x, kernel_size=3, filters=48, stage=1, block=i)
-          x = MaxPooling1D(pool_size=4, strides=None)(x)
-          
-      for i in range(3):
-          x = identity_block(x, kernel_size=3, filters=96, stage=2, block=i)  
-      x = MaxPooling1D(pool_size=4, strides=None)(x)
+        x = MaxPooling1D(pool_size=4, strides=None)(x)
+        
+    for i in range(3):
+        x = identity_block(x, kernel_size=3, filters=96, stage=2, block=i)  
+    x = MaxPooling1D(pool_size=4, strides=None)(x)
       
     x = GlobalAveragePooling1D()(x)
 
@@ -106,8 +98,8 @@ def SDLM(input, opt, backbone=False):
  
     x = Dense(opt.embedding_size)(x)
     x = BatchNormalization()(x)
-    logit = x 
-    # logit = Lambda(lambda x: K.l2_normalize(x, axis=1))(x)
+    # logit = x 
+    logit = Lambda(lambda x: K.l2_normalize(x, axis=1))(x)
     softmax = Dense(opt.num_classes, activation='softmax')(x)
     
 

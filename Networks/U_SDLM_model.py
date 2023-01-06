@@ -1,6 +1,7 @@
 from keras.layers import Dense
 import tensorflow.keras.backend as K
-from tensorflow.keras.layers import BatchNormalization, Dropout, Activation
+from tensorflow.keras.layers import BatchNormalization, Dropout, Activation, Lambda
+from tensorflow.keras import regularizers
 
 
 def U_SDLM(input, opt):

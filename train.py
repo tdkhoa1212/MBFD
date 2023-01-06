@@ -24,8 +24,10 @@ def parse_opt(known=False):
     # Parameters--------
     parser.add_argument('--alpha', default=0.4, type=int)
     parser.add_argument('--lambda_', default=0.3, type=int)
-    parser.add_argument('--embedding_size', default=256, type=int)
-
+    parser.add_argument('--embedding_size', default=256, type=int) 
+    parser.add_argument('--input_shape', default=250604, type=int)  
+    parser.add_argument('--num_classes', default=3, type=int) 
+    
     # Mode-------
     parser.add_argument('--table', type=str, default='table7', help='table6, table7')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
@@ -74,7 +76,7 @@ def train_table7(opt):
 
 if __name__ == '__main__':
     opt = parse_opt()
-    print('*'*10 + f'RUN: {opt.table}' + '*'*10)
+    print('*'*10 + f' RUN: {opt.table} ' + '*'*10)
     if opt.table == 'table6':
         train_table6(opt)
     if opt.table == 'table7':

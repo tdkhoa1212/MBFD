@@ -40,8 +40,8 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     c_y = c_model([c_i])
 
     # Triplet model----------------------------------------------------------
-    t_i = Input(shape=(opt.input_shape, 1))
-    softmax, logits = SDLM(opt, t_i)
+    t_i = Input(shape=(opt.input_shape, 1), name='Triplet_model')
+    softmax, logits = SDLM(t_i, opt)
     t_model = Model(inputs=[t_i], outputs=[softmax, logits])
     t_model.summary()
   
@@ -51,8 +51,8 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     
 
     soft_a, logits_a = t_model([a_i])
-    soft_p, logits_p       = t_model([p_i])
-    soft_n, logits_n       = t_model([n_i])
+    soft_p, logits_p = t_model([p_i])
+    soft_n, logits_n = t_model([n_i])
 
     m_logit  = concatenate([logits_a, e_y_1, logits_p, e_y_2, logits_n, e_y_3, c_y], axis=-1, name='merged_logit_output')
     m_soft = concatenate([soft_a, soft_p, soft_n], axis=-1, name='merged_soft_ouput')
@@ -69,22 +69,22 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     # Data of extract branch
     if opt.Ex_feature == 'time':
         e_a_data = extracted_feature_of_signal(np.squeeze(a_data))
-        e_p_data = extracted_feature_of_signal(np.aqueeze(p_data))
-        e_n_data = extracted_feature_of_signal(np.aqueeze(n_data))
+        e_p_data = extracted_feature_of_signal(np.squeeze(p_data))
+        e_n_data = extracted_feature_of_signal(np.squeeze(n_data))
 
     if opt.Ex_feature == 'fre':
         e_a_data = handcrafted_features(np.squeeze(a_data))
-        e_p_data = handcrafted_features(np.aqueeze(p_data))
-        e_n_data = handcrafted_features(np.aqueeze(n_data))
+        e_p_data = handcrafted_features(np.squeeze(p_data))
+        e_n_data = handcrafted_features(np.squeeze(n_data))
 
     if opt.Ex_feature == 'time_fre':
         a_time   = extracted_feature_of_signal(np.squeeze(a_data))
-        p_time   = extracted_feature_of_signal(np.aqueeze(p_data))
-        n_time   = extracted_feature_of_signal(np.aqueeze(n_data))
+        p_time   = extracted_feature_of_signal(np.squeeze(p_data))
+        n_time   = extracted_feature_of_signal(np.squeeze(n_data))
 
         a_fre   = handcrafted_features(np.squeeze(a_data))
-        p_fre   = handcrafted_features(np.aqueeze(p_data))
-        n_fre   = handcrafted_features(np.aqueeze(n_data))
+        p_fre   = handcrafted_features(np.squeeze(p_data))
+        n_fre   = handcrafted_features(np.squeeze(n_data))
 
         e_a_data = np.concatenate((a_time, a_fre), axis=-1)
         e_p_data = np.concatenate((p_time, p_fre), axis=-1)
