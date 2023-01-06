@@ -3,31 +3,45 @@ from train import parse_opt
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import accuracy_score
-from utils.tools import ML_models
+from utils.tools import ML_models, scaler_fit
+from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 
 opt = parse_opt()
 
 class FaceNetOneShotRecognitor(object):
-    def __init__(self, opt, X_train, y_train, X_test, y_test, model):
+    def __init__(self, X_train, y_train, X_test, y_test, model, opt):
         self.opt = opt
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test   = X_test, y_test
         self.model = model
-    
-    def emb_test(self, input_data):
-        pd = []
-        if len(input_data) == 1: # Only one test input data
-            pd = np.array(self.model(input_data))
-        elif len(input_data) > 1: # Multi test input data
-            for start in tqdm(range(0, len(input_data), self.opt.batch_size)):
-                embeddings = self.model(input_data[start: start+self.opt.batch_size])
-                if pd == []:
-                    pd = embeddings
-                else:
-                    pd = np.concatenate((pd, embeddings))
-        return pd
+
+    def get_emb(self):
+        # Extract data--------------------------------------
+        if self.opt.Ex_feature == 'time':
+            X_train_e = extracted_feature_of_signal(np.squeeze(self.X_train))
+            X_test_e = extracted_feature_of_signal(np.squeeze(self.X_test))
+        if self.opt.Ex_feature == 'fre':
+            X_train_e = handcrafted_features(np.squeeze(self.X_train))
+            X_test_e = handcrafted_features(np.squeeze(self.X_test))
+        if self.opt.Ex_feature == 'time_fre':
+            X_train_time_e = extracted_feature_of_signal(np.squeeze(self.X_train))
+            X_train_fre_e = handcrafted_features(np.squeeze(self.X_train))
+            X_train_e = np.concatenate((X_train_time_e, X_train_fre_e), axis=-1)
+
+            X_test_time_e = extracted_feature_of_signal(np.squeeze(self.X_test))
+            X_test_fre_e = handcrafted_features(np.squeeze(self.X_test))
+            X_test_e = np.concatenate((X_test_time_e, X_test_fre_e), axis=-1)
+
+        # Scale data----------------------------------------
+        if opt.scaler != 'None':
+            X_train_sc, scale = scaler_fit(self.X_train, self.opt)
+            X_test_sc = scale_test(self.X_test, scale)
+
+        _, X_train_embed = self.model.predict([X_train_sc, X_train_e])
+        y_soft_pred, X_test_embed = self.model.predict([X_test_sc, X_test_e])
+        return X_train_embed, X_test_embed, y_soft_pred
       
-    def predict(self, test_embs, train_embs, ML_method=None, emb=True, use_mean_var=False):
+    def predict(self, test_embs, train_embs, ML_method=None, use_mean_var=False):
         print('\n Test embs shape: ', test_embs.shape)
         print('Train embs shape: ', train_embs.shape)
         

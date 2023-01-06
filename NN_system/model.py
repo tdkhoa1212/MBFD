@@ -9,6 +9,7 @@ from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
 import numpy as np
+import AngularGrad
 
 def train_model(X_train, y_train, X_test, y_test, opt):
     # Expand 1 channel for data ------------------------------
@@ -70,28 +71,24 @@ def train_model(X_train, y_train, X_test, y_test, opt):
         e_a_data = extracted_feature_of_signal(np.squeeze(a_data))
         e_p_data = extracted_feature_of_signal(np.aqueeze(p_data))
         e_n_data = extracted_feature_of_signal(np.aqueeze(n_data))
-        X_train_e = extracted_feature_of_signal(np.squeeze(X_train))
 
     if opt.Ex_feature == 'fre':
         e_a_data = handcrafted_features(np.squeeze(a_data))
         e_p_data = handcrafted_features(np.aqueeze(p_data))
         e_n_data = handcrafted_features(np.aqueeze(n_data))
-        X_train_e = handcrafted_features(np.squeeze(X_train))
 
     if opt.Ex_feature == 'time_fre':
         a_time   = extracted_feature_of_signal(np.squeeze(a_data))
         p_time   = extracted_feature_of_signal(np.aqueeze(p_data))
         n_time   = extracted_feature_of_signal(np.aqueeze(n_data))
-        X_time_e = extracted_feature_of_signal(np.squeeze(X_train))
+
         a_fre   = handcrafted_features(np.squeeze(a_data))
         p_fre   = handcrafted_features(np.aqueeze(p_data))
         n_fre   = handcrafted_features(np.aqueeze(n_data))
-        X_fre_e = handcrafted_features(np.squeeze(X_train))
 
         e_a_data = np.concatenate((a_time, a_fre), axis=-1)
         e_p_data = np.concatenate((p_time, p_fre), axis=-1)
         e_n_data = np.concatenate((n_time, n_fre), axis=-1)
-        X_train_e = np.concatenate((X_time_e, X_fre_e), axis=-1)
 
     a_label = one_hot(y_train[:, 0])
     p_label = one_hot(y_train[:, 1])
@@ -130,10 +127,10 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     logits_e_a = concatenate([logits_a, e_y_1], axis=-1, name='logit anchor head')
     model = Model(inputs=[a_i, e_i_1], outputs=[soft_a, logits_e_a])
     model.load_weights(path)
+    return model
 
-    _, X_train_embed = model.predict([x_train_scale, x_train_extract])
-    y_test_soft, X_test_embed = model.predict([x_test_scale, x_test_extract])
+    
     
     from TSNE_plot import tsne_plot
-    tsne_plot(outdir, 'original', X_train_embed[:, :opt.embedding_size], X_test_embed[:, :opt.embedding_size], y_train, y_test)
-    tsne_plot(outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], X_test_embed[:, opt.embedding_size: ], y_train, y_test)
+    tsne_plot(opt.img_outdir, 'original', X_train_embed[:, :opt.embedding_size], X_test_embed[:, :opt.embedding_size], y_train, y_test)
+    tsne_plot(opt.img_outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], X_test_embed[:, opt.embedding_size: ], y_train, y_test)
