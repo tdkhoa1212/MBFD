@@ -4,8 +4,6 @@ from itertools import permutations
 import random
 import tensorflow as tf
 import numpy as np
-from train import parse_opt
-opt = parse_opt()
 
 
 def generate_triplet(x, y,  ap_pairs=16, an_pairs=16):
@@ -42,7 +40,7 @@ def generate_triplet(x, y,  ap_pairs=16, an_pairs=16):
     return np.array(triplet_train_pairs), np.array(y_triplet_pairs)
 
     
-def new_triplet_loss(y_true, y_pred, alpha=opt.alpha, lambda_=opt.lambda_):
+def new_triplet_loss(y_true, y_pred, alpha=0.2, lambda_=0.4):
     """
     Implementation of the triplet loss function
     Arguments:
@@ -93,7 +91,7 @@ def magnitudes(x):
 def product(x, y):
   return tf.math.reduce_sum(x*y)
 
-def triplet_loss(y_true, y_pred, alpha=0.4, lambda_=opt.lambda_):
+def triplet_loss(y_true, y_pred, alpha=0.4):
     """
     Implementation of the triplet loss function
     Arguments:

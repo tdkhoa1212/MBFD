@@ -1,1 +1,2 @@
 lightgbm
+tensorflow_addons

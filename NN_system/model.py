@@ -9,7 +9,7 @@ from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
 import numpy as np
-import AngularGrad
+from utils.angular_grad import AngularGrad
 
 def train_model(X_train, y_train, X_test, y_test, opt):
     # Expand 1 channel for data ------------------------------
@@ -131,6 +131,4 @@ def train_model(X_train, y_train, X_test, y_test, opt):
 
     
     
-    from TSNE_plot import tsne_plot
-    tsne_plot(opt.img_outdir, 'original', X_train_embed[:, :opt.embedding_size], X_test_embed[:, :opt.embedding_size], y_train, y_test)
-    tsne_plot(opt.img_outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], X_test_embed[:, opt.embedding_size: ], y_train, y_test)
+    

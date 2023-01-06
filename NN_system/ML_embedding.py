@@ -1,12 +1,10 @@
 from scipy.spatial.distance import cosine, euclidean
-from train import parse_opt
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import accuracy_score
 from utils.tools import ML_models, scaler_fit
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 
-opt = parse_opt()
 
 class FaceNetOneShotRecognitor(object):
     def __init__(self, X_train, y_train, X_test, y_test, model, opt):
