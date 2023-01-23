@@ -31,7 +31,7 @@ class FaceNetOneShotRecognitor(object):
             X_test_e = np.concatenate((X_test_time_e, X_test_fre_e), axis=-1)
 
         # Scale data----------------------------------------
-        if opt.scaler != 'None':
+        if self.opt.scaler != 'None':
             X_train_sc, scale = scaler_fit(self.X_train, self.opt)
             X_test_sc = scale_test(self.X_test, scale)
 

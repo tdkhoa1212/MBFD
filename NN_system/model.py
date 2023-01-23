@@ -1,6 +1,6 @@
 from tensorflow.keras.layers import concatenate, Input
 from Networks.center_model import center
-from Networks.SDLM_model import SDLM
+from Networks.S_SDLM_model import SDLM
 from Networks.U_SDLM_model import U_SDLM
 from utils.triplet import new_triplet_loss, generate_triplet
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features

@@ -1,18 +1,13 @@
-import os
-import tensorflow as tf
+from tensorflow.keras.layers import Conv1D, Activation, \
+                                    Dense, BatchNormalization, \
+                                    Lambda, MaxPooling1D, GlobalAveragePooling1D, Input, concatenate
 from tensorflow_addons.layers import MultiHeadAttention
 import keras.backend as K
-from tensorflow.keras import layers
-from tensorflow.keras import regularizers
-from tensorflow.keras.layers import Activation, BatchNormalization, \
-                                    Conv1D, Dense, GlobalAveragePooling1D, \
-                                    MaxPooling1D, Lambda, concatenate, Lambda
+from keras import layers, regularizers
+from keras.models import Model
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-
-
-def TransformerLayer(x=None, c=48, num_heads=4):
+def TransformerLayer(x=None, c=48, num_heads=12):
+    # Transformer layer https://arxiv.org/abs/2010.11929 (LayerNorm layers removed for better performance)
     q   = Dense(c, use_bias=True, 
                   kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                   bias_regularizer=regularizers.l2(1e-4),
@@ -25,8 +20,18 @@ def TransformerLayer(x=None, c=48, num_heads=4):
                   kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                   bias_regularizer=regularizers.l2(1e-4),
                   activity_regularizer=regularizers.l2(1e-5))(x)
-    ma  = MultiHeadAttention(head_size=c, num_heads=num_heads)([q, k, v]) 
-    return ma
+    ma  = MultiHeadAttention(head_size=c, num_heads=num_heads)([q, k, v]) + x
+    fc1 = Dense(c, use_bias=True, 
+                  kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                  bias_regularizer=regularizers.l2(1e-4),
+                  activity_regularizer=regularizers.l2(1e-5))(ma) 
+#     fc1 = tf.keras.layers.Dropout(0.5)(fc1)                           
+    fc2 = Dense(c, use_bias=True, 
+                  kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                  bias_regularizer=regularizers.l2(1e-4),
+                  activity_regularizer=regularizers.l2(1e-5))(fc1) + x
+#     fc2 = tf.keras.layers.Dropout(0.5)(fc2) 
+    return fc2
 
 # For m34 Residual, use RepeatVector. Or tensorflow backend.repeat
 def identity_block(input_tensor, kernel_size, filters, stage, block):
@@ -37,10 +42,10 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
                kernel_size=kernel_size,
                strides=1,
                padding='same',
-              kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
-              bias_regularizer=regularizers.l2(1e-4),
-              activity_regularizer=regularizers.l2(1e-5),
-              name=conv_name_base + '2a')(input_tensor)
+                kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                bias_regularizer=regularizers.l2(1e-4),
+                activity_regularizer=regularizers.l2(1e-5),
+                name=conv_name_base + '2a')(input_tensor)
     x = BatchNormalization(name=bn_name_base + '2a')(x)
     x = Activation('relu')(x)
 
@@ -48,12 +53,16 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
                kernel_size=kernel_size,
                strides=1,
                padding='same',
-              kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
-              bias_regularizer=regularizers.l2(1e-4),
-              activity_regularizer=regularizers.l2(1e-5),
-              name=conv_name_base + '2b')(x)
+                kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                bias_regularizer=regularizers.l2(1e-4),
+                activity_regularizer=regularizers.l2(1e-5),
+                name=conv_name_base + '2b')(x)
     x = BatchNormalization(name=bn_name_base + '2b')(x)
 
+    # up-sample from the activation maps.
+    # otherwise it's a mismatch. Recommendation of the authors.
+    # here we x2 the number of filters.
+    # See that as duplicating everything and concatenate them.
     if input_tensor.shape[2] != x.shape[2]:
         x = layers.add([x, Lambda(lambda y: K.repeat_elements(y, rep=2, axis=2))(input_tensor)])
     else:
@@ -63,11 +72,52 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = Activation('relu')(x)
     return x
 
-def SDLM(input_, opt, backbone=False):
+# For m34 Residual, use RepeatVector. Or tensorflow backend.repeat
+def identity_block(input_tensor, kernel_size, filters, stage, block):
+    conv_name_base = 'res' + str(stage) + str(block) + '_branch'
+    bn_name_base = 'bn' + str(stage) + str(block) + '_branch'
+
+    x = Conv1D(filters,
+               kernel_size=kernel_size,
+               strides=1,
+               padding='same',
+                kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                bias_regularizer=regularizers.l2(1e-4),
+                activity_regularizer=regularizers.l2(1e-5),
+                name=conv_name_base + '2a')(input_tensor)
+    x = BatchNormalization(name=bn_name_base + '2a')(x)
+    x = Activation('relu')(x)
+
+    x = Conv1D(filters,
+               kernel_size=kernel_size,
+               strides=1,
+               padding='same',
+                kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                bias_regularizer=regularizers.l2(1e-4),
+                activity_regularizer=regularizers.l2(1e-5),
+                name=conv_name_base + '2b')(x)
+    x = BatchNormalization(name=bn_name_base + '2b')(x)
+
+    # up-sample from the activation maps.
+    # otherwise it's a mismatch. Recommendation of the authors.
+    # here we x2 the number of filters.
+    # See that as duplicating everything and concatenate them.
+    if input_tensor.shape[2] != x.shape[2]:
+        x = layers.add([x, Lambda(lambda y: K.repeat_elements(y, rep=2, axis=2))(input_tensor)])
+    else:
+        x = layers.add([x, input_tensor])
+
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    return 
+
+
+def SDLM(opt):
     '''
     The model was rebuilt based on the construction of resnet 34 and inherited from this source code:
     https://github.com/philipperemy/very-deep-convnets-raw-waveforms/blob/master/model_resnet.py
     '''
+    inputs = Input(shape=[opt.input_shape, 1])
     x = Conv1D(48,
                kernel_size=80,
                strides=4,
@@ -92,15 +142,7 @@ def SDLM(input_, opt, backbone=False):
     x1 = TransformerLayer(x=x, c=96)
     x2 = TransformerLayer(x=x, c=96)
     x = concatenate([x1, x2], axis=-1)
+    x = Dense(opt.num_classes, activation='softmax')(x)
 
-    if backbone:
-        return x
- 
-    x = Dense(opt.embedding_size)(x)
-    x = BatchNormalization()(x)
-    # logit = x 
-    logit = Lambda(lambda x: K.l2_normalize(x, axis=1))(x)
-    softmax = Dense(opt.num_classes, activation='softmax')(x)
-    
-
-    return softmax, logit
+    m = Model(inputs, x, name='SDLM_model')
+    return m
