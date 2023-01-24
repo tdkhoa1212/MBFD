@@ -11,7 +11,7 @@ from tensorflow.saved_model import save
 import numpy as np
 from utils.angular_grad import AngularGrad
 
-def train_model(X_train, y_train, X_test, y_test, opt):
+def train_main_system(X_train, y_train, X_test, y_test, opt):
     # Expand 1 channel for data ------------------------------
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
@@ -31,13 +31,12 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     e_o_3  = U_SDLM(e_i_3, opt)
     e_model_3 = Model(inputs=[e_i_3], outputs=[e_o_3])
     e_y_3 = e_model_3([e_i_3])
-    e_model_1.summary()
 
      # Center model----------------------------------------------------------
-    c_i   = Input((1,), name='center_input')
-    c_o = center(c_i, opt)
+    c_i     = Input((1,), name='center_input')
+    c_o     = center(c_i, opt)
     c_model = Model(inputs=[c_i], outputs=[c_o])
-    c_y = c_model([c_i])
+    c_y     = c_model([c_i])
 
     # Triplet model----------------------------------------------------------
     t_i = Input(shape=(opt.input_shape, 1), name='Triplet_model')
@@ -45,9 +44,9 @@ def train_model(X_train, y_train, X_test, y_test, opt):
     t_model = Model(inputs=[t_i], outputs=[softmax, logits])
     t_model.summary()
   
-    a_i   = Input((opt.input_shape, 1,), name='anchor_input')
-    p_i = Input((opt.input_shape, 1,), name='positive_input')
-    n_i = Input((opt.input_shape, 1,), name='negative_input')
+    a_i = Input((opt.input_shape, 1), name='anchor_input')
+    p_i = Input((opt.input_shape, 1), name='positive_input')
+    n_i = Input((opt.input_shape, 1), name='negative_input')
     
 
     soft_a, logits_a = t_model([a_i])

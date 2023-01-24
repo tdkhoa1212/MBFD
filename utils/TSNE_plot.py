@@ -26,8 +26,7 @@ def scatter(outdir, x, labels, subtitle=None):
         # Position of each label.
         xtext, ytext = np.median(x[labels == i, :], axis=0)
         txt = ax.text(xtext, ytext, str(i), fontsize=24)
-        txt.set_path_effects([PathEffects.Stroke(linewidth=5, foreground="w"),
-                              PathEffects.Normal()])
+        txt.set_path_effects([PathEffects.Stroke(linewidth=5, foreground="w"), PathEffects.Normal()])
         txts.append(txt)
 
     if subtitle != None:
