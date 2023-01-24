@@ -1,3 +1,2 @@
 lightgbm
 tensorflow_addons
-Tensorflow==2.2.0
