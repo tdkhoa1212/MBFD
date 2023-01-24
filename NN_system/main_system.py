@@ -1,6 +1,6 @@
 from tensorflow.keras.layers import concatenate, Input
 from Networks.center_model import center
-from Networks.S_SDLM_model import SDLM
+from Networks.S_SDLM_model import S_SDLM
 from Networks.U_SDLM_model import U_SDLM
 from utils.triplet import new_triplet_loss, generate_triplet
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
@@ -40,7 +40,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
 
     # Triplet model----------------------------------------------------------
     t_i = Input(shape=(opt.input_shape, 1), name='Triplet_model')
-    softmax, logits = SDLM(t_i, opt)
+    softmax, logits = S_SDLM(t_i, opt)
     t_model = Model(inputs=[t_i], outputs=[softmax, logits])
     t_model.summary()
   
@@ -97,7 +97,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     t_soft = np.concatenate((a_label, p_label, n_label), -1)
 
     model = Model(inputs=[a_i, e_i_1, p_i, e_i_2, n_i, e_i_3, c_i], outputs=[m_soft, m_logit])
-    path = join(opt.weights_path, "S_SDLM")
+    path = join(opt.weights_path, "main_SDLM")
     if opt.load_weights:
         if isdir(path):
             model.load_weights(path)
@@ -123,8 +123,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     save(model, path)
 
     # ------------------------------------- TEST MODEL ---------------------------------------------------------
-    logits_e_a = concatenate([logits_a, e_y_1], axis=-1, name='logit anchor head')
-    model = Model(inputs=[a_i, e_i_1], outputs=[soft_a, logits_e_a])
+    model = Model(inputs=[a_i, e_i_1], outputs=[soft_a, logits_a])
     model.load_weights(path)
     return model
 

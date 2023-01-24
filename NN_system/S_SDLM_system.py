@@ -17,7 +17,6 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     t_i = Input(shape=(opt.input_shape, 1), name='Triplet_model')
     softmax, logits = S_SDLM(t_i, opt)
     t_model = Model(inputs=[t_i], outputs=[softmax, logits])
-    t_model.summary()
   
     a_i = Input((opt.input_shape, 1), name='anchor_input')
     p_i = Input((opt.input_shape, 1), name='positive_input')
@@ -27,8 +26,8 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     soft_p, logits_p = t_model([p_i])
     soft_n, logits_n = t_model([n_i])
 
-    m_logit  = concatenate([logits_a, logits_p, logits_n], axis=-1, name='merged_logit_output')
-    m_soft = concatenate([soft_a, soft_p, soft_n], axis=-1, name='merged_soft_ouput')
+    m_logit = concatenate([logits_a, logits_p, logits_n], axis=-1, name='merged_logit_output')
+    m_soft  = concatenate([soft_a, soft_p, soft_n], axis=-1, name='merged_soft_ouput')
     
     loss_weights = [1, 0.01]
 
@@ -42,11 +41,12 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     a_label = one_hot(y_train[:, 0])
     p_label = one_hot(y_train[:, 1])
     n_label = one_hot(y_train[:, 2])
-    c_data   = y_train[:, 1]
 
     t_soft = np.concatenate((a_label, p_label, n_label), -1)
+    print(t_soft.shape, a_data.shape, p_data.shape, n_data.shape)
 
     model = Model(inputs=[a_i, p_i, n_i], outputs=[m_soft, m_logit])
+    model.summary()
     path = join(opt.weights_path, "S_SDLM")
     if opt.load_weights:
         if isdir(path):
@@ -55,16 +55,15 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
         else:
             print('\n No weight file.')
 
-    model.compile(loss=["categorical_crossentropy",
-                  triplet_loss],
-                  optimizer=AngularGrad(), 
-                  metrics=["accuracy"], 
-                  loss_weights=loss_weights)
+    model.compile(loss         = ["categorical_crossentropy", triplet_loss],
+                  optimizer    = AngularGrad(), 
+                  metrics      = ["accuracy"], 
+                  loss_weights = loss_weights)
 
     # Note:
     # y=[t_soft, c_data] c_data is just for afternative position for blank position
     # only use t_soft for softmax head in training process
-    model.fit(x=[a_data, p_data, n_data, c_data], y=[t_soft, c_data],
+    model.fit(x=[a_data, p_data, n_data], y=[t_soft],
               batch_size=opt.batch_size, 
               epochs=opt.epochs, 
               # callbacks=[callback], 
@@ -73,8 +72,7 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     save(model, path)
 
     # ------------------------------------- TEST MODEL ---------------------------------------------------------
-    logits_e_a = concatenate([logits_a], axis=-1, name='logit anchor head')
-    model = Model(inputs=[a_i], outputs=[soft_a, logits_e_a])
+    model = Model(inputs=[a_i], outputs=[soft_a, logits_a])
     model.load_weights(path)
     return model
 

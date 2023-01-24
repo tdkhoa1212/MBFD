@@ -15,7 +15,7 @@ def load_PU_table(opt):
         KI05 = load_PU_data(join(opt.data_dir, 'KI05'), opt)
         KI07 = load_PU_data(join(opt.data_dir, 'KI07'), opt)
 
-        print('Load Testing---------------------------------------------\n')
+        print('Load Testing ---------------------------------------------\n')
         K001 = load_PU_data(join(opt.data_dir, 'K001'), opt)
         
         KA22 = load_PU_data(join(opt.data_dir, 'KA22'), opt)
