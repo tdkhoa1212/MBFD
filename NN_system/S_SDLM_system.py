@@ -6,6 +6,7 @@ from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
 import numpy as np
+import tensorflow as tf
 from utils.angular_grad import AngularGrad
 
 def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
@@ -56,7 +57,7 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
             print('\n No weight file.')
 
     model.compile(loss         = ["categorical_crossentropy", triplet_loss],
-                  optimizer    = AngularGrad(), 
+                  optimizer    = tf.keras.optimizers.experimental.RMSprop(), 
                   metrics      = ["accuracy"], 
                   loss_weights = loss_weights)
 

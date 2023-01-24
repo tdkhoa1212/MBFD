@@ -9,6 +9,7 @@ from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
 import numpy as np
+import tensorflow as tf
 from utils.angular_grad import AngularGrad
 
 def train_main_system(X_train, y_train, X_test, y_test, opt):
@@ -107,7 +108,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
 
     model.compile(loss=["categorical_crossentropy",
                   new_triplet_loss],
-                  optimizer=AngularGrad(), 
+                  optimizer=tf.keras.optimizers.experimental.RMSprop(), 
                   metrics=["accuracy"], 
                   loss_weights=loss_weights)
 
