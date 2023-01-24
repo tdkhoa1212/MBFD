@@ -35,7 +35,7 @@ def parse_opt(known=False):
     
     # Mode-------
     parser.add_argument('--table', type=str, default='table7', help='table6, table7')
-    parser.add_argument('--model', type=str, default='SDLM', help='main_model, SDLM, S_SDLM, U_SDLM')
+    parser.add_argument('--model', type=str, default='S_SDLM', help='main_model, SDLM, S_SDLM, U_SDLM')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
