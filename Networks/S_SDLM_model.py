@@ -1,9 +1,8 @@
 import os
 import tensorflow as tf
 from tensorflow_addons.layers import MultiHeadAttention
-import keras.backend as K
-from tensorflow.keras import layers
-from tensorflow.keras import regularizers
+import tensorflow.keras.backend as K
+from tensorflow.keras import regularizers, layers
 from tensorflow.keras.layers import Activation, BatchNormalization, \
                                     Conv1D, Dense, GlobalAveragePooling1D, \
                                     MaxPooling1D, Lambda, concatenate, Lambda

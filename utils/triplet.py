@@ -103,14 +103,11 @@ def triplet_loss(y_true, y_pred, alpha=0.4):
     Returns:
     loss -- real number, value of the loss
     """
-    total_lenght = y_pred.shape.as_list()[-1]
+    total_each_lenght = y_pred.shape.as_list()[-1]//3
 
-    anchor   = y_pred[:, 0:int(total_lenght * 1 / 3)]
-    anchor   = tf.math.l2_normalize(anchor, axis=1, epsilon=1e-10)
-    positive = y_pred[:, int(total_lenght * 1 / 3):int(total_lenght * 2 / 3)]
-    positive = tf.math.l2_normalize(positive, axis=1, epsilon=1e-10)
-    negative = y_pred[:, int(total_lenght * 2 / 3):int(total_lenght * 3 / 3)]
-    negative = tf.math.l2_normalize(negative, axis=1, epsilon=1e-10)
+    anchor   = y_pred[:, :total_each_lenght]
+    positive = y_pred[:, total_each_lenght: total_each_lenght*2]
+    negative = y_pred[:, total_each_lenght*2: ]
 
     # distance between the anchor and the positive
     pos_dist          = K.sum(K.square(anchor - positive), axis=1)

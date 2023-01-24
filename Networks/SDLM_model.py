@@ -3,9 +3,9 @@ from tensorflow.keras.layers import Conv1D, Activation, \
                                     Lambda, MaxPooling1D, GlobalAveragePooling1D, \
                                     Input, concatenate, Dropout
 from tensorflow_addons.layers import MultiHeadAttention
-import keras.backend as K
-from keras import layers, regularizers
-from keras.models import Model
+import tensorflow.keras.backend as K
+from tensorflow.keras import layers, regularizers
+from tensorflow.keras.models import Model
 
 def TransformerLayer(x=None, c=48, num_heads=12):
     # Transformer layer https://arxiv.org/abs/2010.11929 (LayerNorm layers removed for better performance)

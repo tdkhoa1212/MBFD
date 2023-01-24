@@ -1,6 +1,5 @@
-from keras.layers import Dense
 import tensorflow.keras.backend as K
-from tensorflow.keras.layers import BatchNormalization, Dropout, Activation, Lambda
+from tensorflow.keras.layers import BatchNormalization, Dropout, Activation, Lambda, Dense
 from tensorflow.keras import regularizers
 
 

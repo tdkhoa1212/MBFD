@@ -63,7 +63,7 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     # Note:
     # y=[t_soft, c_data] c_data is just for afternative position for blank position
     # only use t_soft for softmax head in training process
-    model.fit(x=[a_data, p_data, n_data], y=[t_soft],
+    model.fit(x=[a_data, p_data, n_data], y=[t_soft, t_soft],
               batch_size=opt.batch_size, 
               epochs=opt.epochs, 
               # callbacks=[callback], 
