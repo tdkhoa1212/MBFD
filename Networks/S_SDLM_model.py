@@ -102,5 +102,4 @@ def SDLM(input_, opt, backbone=False):
     logit = Lambda(lambda x: K.l2_normalize(x, axis=1))(x)
     softmax = Dense(opt.num_classes, activation='softmax')(x)
     
-
     return softmax, logit

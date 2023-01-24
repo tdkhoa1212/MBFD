@@ -2,11 +2,11 @@ import argparse
 import numpy as np
 from Networks.SDLM_model import SDLM
 from utils.PU import load_PU_table
-from utils.tools import scaler_fit, ML_models, scale_test
+from utils.tools import scaler_fit, ML_models, scale_test, one_hot
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 from NN_system.ML_embedding import FaceNetOneShotRecognitor
 from NN_system.model import train_model
-from 
+from Networks.SDLM_model import SDLM
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -29,7 +29,7 @@ def parse_opt(known=False):
     parser.add_argument('--embedding_size', default=256, type=int) 
     parser.add_argument('--input_shape', default=250604, type=int)  
     parser.add_argument('--num_classes', default=3, type=int) 
-    parser.add_argument('--batch_size', default=64, type=int) 
+    parser.add_argument('--batch_size', default=32, type=int) 
     parser.add_argument('--epochs', default=60, type=int) 
     
     # Mode-------
@@ -79,11 +79,13 @@ def train_table7(opt):
         tsne_plot(opt.img_outdir, 'original', X_train_embed[:, :opt.embedding_size], X_test_embed[:, :opt.embedding_size], y_train, y_test)
         tsne_plot(opt.img_outdir, 'extracted', X_train_embed[:, opt.embedding_size: ], X_test_embed[:, opt.embedding_size: ], y_train, y_test)
     if opt.model == 'SDLM':
+        y_test = one_hot(y_test)
+        y_train = one_hot(y_train)
         model = SDLM(opt)
         model.compile(optimizer="Adam", loss='categorical_crossentropy', metrics=['acc']) # loss='mse'
         model.summary()
         history = model.fit(X_train, y_train,
-                            epochs     = opt.epoch,
+                            epochs     = opt.epochs,
                             batch_size = opt.batch_size,
                             validation_data=(X_test, y_test),)
         _, test_acc = model.evaluate(X_test, y_test, verbose=0)
@@ -96,3 +98,4 @@ if __name__ == '__main__':
         train_table6(opt)
     if opt.table == 'table7':
         train_table7(opt)
+    
