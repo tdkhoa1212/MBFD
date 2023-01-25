@@ -1,7 +1,7 @@
 from tensorflow.keras.layers import concatenate, Input
 from Networks.S_SDLM_model import S_SDLM
 from utils.triplet import triplet_loss, generate_triplet
-from utils.tools import one_hot
+from utils.tools import one_hot, scaler_fit, scale_test
 from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
@@ -10,6 +10,10 @@ import tensorflow as tf
 from utils.angular_grad import AngularGrad
 
 def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
+    if opt.scaler != None:
+      X_train, scale = scaler_fit(X_train, opt)
+      X_test = scale_test(X_test, scale)
+
     # Expand 1 channel for data ------------------------------
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
@@ -31,8 +35,9 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     m_soft  = concatenate([soft_a, soft_p, soft_n], axis=-1, name='merged_soft_ouput')
     
     loss_weights = [1, 0.01]
+    path = join(opt.weights_path, "S_SDLM")
 
-    if opt.train_model:
+    if opt.train_mode:
         # ------------------------------------- GENERATE DATA ---------------------------------------------------------
         # Data of main branch
         X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
@@ -45,11 +50,10 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
         n_label = one_hot(y_train[:, 2])
 
         t_soft = np.concatenate((a_label, p_label, n_label), -1)
-        print(t_soft.shape, a_data.shape, p_data.shape, n_data.shape)
 
         model = Model(inputs=[a_i, p_i, n_i], outputs=[m_soft, m_logit])
         model.summary()
-        path = join(opt.weights_path, "S_SDLM")
+        
         if opt.load_weights:
             if isdir(path):
                 model.load_weights(path)
@@ -77,7 +81,3 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     model = Model(inputs=[a_i], outputs=[soft_a, logits_a])
     model.load_weights(path)
     return model
-
-    
-    
-    

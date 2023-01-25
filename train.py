@@ -14,7 +14,7 @@ def parse_opt(known=False):
     
     # Models and denoising methods--------------------------
     parser.add_argument('--ML_method', default='SVM' , type=str, help='SVM, RF, KNN, LGBM, euclidean, cosine')
-    parser.add_argument('--scaler', default='MinMaxScaler', type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
+    parser.add_argument('--scaler', default=None, type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
     parser.add_argument('--type_data', type=str, default='vibration', help='vibration, MCS1, MCS2')
     parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data', help='direction of data')
     parser.add_argument('--weights_path', type=str, default='/content/drive/MyDrive/Khoa/vibration_project/Classification/results', help='direction of data')

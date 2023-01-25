@@ -4,7 +4,7 @@ from Networks.S_SDLM_model import S_SDLM
 from Networks.U_SDLM_model import U_SDLM
 from utils.triplet import new_triplet_loss, generate_triplet
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
-from utils.tools import one_hot
+from utils.tools import one_hot, scaler_fit, scale_test
 from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
@@ -13,6 +13,9 @@ import tensorflow as tf
 from utils.angular_grad import AngularGrad
 
 def train_main_system(X_train, y_train, X_test, y_test, opt):
+    if opt.scaler != None:
+        X_train, scale = scaler_fit(X_train, opt)
+        X_test = scale_test(X_test, scale)
     # Expand 1 channel for data ------------------------------
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
@@ -43,7 +46,6 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     t_i = Input(shape=(opt.input_shape, 1), name='Triplet_model')
     softmax, logits = S_SDLM(t_i, opt)
     t_model = Model(inputs=[t_i], outputs=[softmax, logits])
-    t_model.summary()
   
     a_i = Input((opt.input_shape, 1), name='anchor_input')
     p_i = Input((opt.input_shape, 1), name='positive_input')
@@ -58,8 +60,9 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     m_soft = concatenate([soft_a, soft_p, soft_n], axis=-1, name='merged_soft_ouput')
     
     loss_weights = [1, 0.01]
+    path = join(opt.weights_path, "main_SDLM")
 
-    if opt.train_model:
+    if opt.train_mode:
         # ------------------------------------- GENERATE DATA ---------------------------------------------------------
         # Data of main branch
         X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
@@ -99,7 +102,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         t_soft = np.concatenate((a_label, p_label, n_label), -1)
 
         model = Model(inputs=[a_i, e_i_1, p_i, e_i_2, n_i, e_i_3, c_i], outputs=[m_soft, m_logit])
-        path = join(opt.weights_path, "main_SDLM")
+        model.summary()
         if opt.load_weights:
             if isdir(path):
                 model.load_weights(path)
