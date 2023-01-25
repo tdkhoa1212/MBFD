@@ -32,45 +32,46 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     
     loss_weights = [1, 0.01]
 
-    # ------------------------------------- GENERATE DATA ---------------------------------------------------------
-    # Data of main branch
-    X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
-    a_data = X_train[:, 0].reshape(-1, opt.input_shape, 1)
-    p_data = X_train[:, 1].reshape(-1, opt.input_shape, 1)
-    n_data = X_train[:, 2].reshape(-1, opt.input_shape, 1)
+    if opt.train_model:
+        # ------------------------------------- GENERATE DATA ---------------------------------------------------------
+        # Data of main branch
+        X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
+        a_data = X_train[:, 0].reshape(-1, opt.input_shape, 1)
+        p_data = X_train[:, 1].reshape(-1, opt.input_shape, 1)
+        n_data = X_train[:, 2].reshape(-1, opt.input_shape, 1)
 
-    a_label = one_hot(y_train[:, 0])
-    p_label = one_hot(y_train[:, 1])
-    n_label = one_hot(y_train[:, 2])
+        a_label = one_hot(y_train[:, 0])
+        p_label = one_hot(y_train[:, 1])
+        n_label = one_hot(y_train[:, 2])
 
-    t_soft = np.concatenate((a_label, p_label, n_label), -1)
-    print(t_soft.shape, a_data.shape, p_data.shape, n_data.shape)
+        t_soft = np.concatenate((a_label, p_label, n_label), -1)
+        print(t_soft.shape, a_data.shape, p_data.shape, n_data.shape)
 
-    model = Model(inputs=[a_i, p_i, n_i], outputs=[m_soft, m_logit])
-    model.summary()
-    path = join(opt.weights_path, "S_SDLM")
-    if opt.load_weights:
-        if isdir(path):
-            model.load_weights(path)
-            print(f'\n Load weight : {path}')
-        else:
-            print('\n No weight file.')
+        model = Model(inputs=[a_i, p_i, n_i], outputs=[m_soft, m_logit])
+        model.summary()
+        path = join(opt.weights_path, "S_SDLM")
+        if opt.load_weights:
+            if isdir(path):
+                model.load_weights(path)
+                print(f'\n Load weight : {path}')
+            else:
+                print('\n No weight file.')
 
-    model.compile(loss         = ["categorical_crossentropy", triplet_loss],
-                  optimizer    = tf.keras.optimizers.experimental.RMSprop(), 
-                  metrics      = ["accuracy"], 
-                  loss_weights = loss_weights)
+        model.compile(loss         = ["categorical_crossentropy", triplet_loss],
+                    optimizer    = tf.keras.optimizers.experimental.RMSprop(), 
+                    metrics      = ["accuracy"], 
+                    loss_weights = loss_weights)
 
-    # Note:
-    # y=[t_soft, c_data] c_data is just for afternative position for blank position
-    # only use t_soft for softmax head in training process
-    model.fit(x=[a_data, p_data, n_data], y=[t_soft, t_soft],
-              batch_size=opt.batch_size, 
-              epochs=opt.epochs, 
-              # callbacks=[callback], 
-              shuffle=True)
+        # Note:
+        # y=[t_soft, c_data] c_data is just for afternative position for blank position
+        # only use t_soft for softmax head in training process
+        model.fit(x=[a_data, p_data, n_data], y=[t_soft, t_soft],
+                batch_size=opt.batch_size, 
+                epochs=opt.epochs, 
+                # callbacks=[callback], 
+                shuffle=True)
 
-    save(model, path)
+        save(model, path)
 
     # ------------------------------------- TEST MODEL ---------------------------------------------------------
     model = Model(inputs=[a_i], outputs=[soft_a, logits_a])

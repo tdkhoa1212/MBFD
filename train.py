@@ -32,6 +32,7 @@ def parse_opt(known=False):
     parser.add_argument('--num_classes', default=3, type=int) 
     parser.add_argument('--batch_size', default=32, type=int) 
     parser.add_argument('--epochs', default=20, type=int) 
+    parser.add_argument('--train_mode', default=False, type=bool)
     
     # Mode-------
     parser.add_argument('--table', type=str, default='table7', help='table6, table7')

@@ -2,7 +2,7 @@ from scipy.spatial.distance import cosine, euclidean
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import accuracy_score
-from utils.tools import ML_models, scaler_fit
+from utils.tools import ML_models, scaler_fit, scale_test
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 
 
