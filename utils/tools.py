@@ -27,7 +27,7 @@ def scale_test(test_signals, scale):
 
 def TSNE_plot(x, y, title, save_path):
   tsne = TSNE(n_components=2, verbose=1, random_state=123)
-  x = tsne.fit_transform(x) 
+  z = tsne.fit_transform(x) 
   df = pd.DataFrame()
   df["y"] = y
   df["comp-1"] = z[:,0]
@@ -128,6 +128,3 @@ def one_hot(label):
   for idx, val in enumerate(label):
     new_label[idx, val] = 1
   return new_label
-    
-    
-    

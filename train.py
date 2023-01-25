@@ -34,6 +34,7 @@ def parse_opt(known=False):
     parser.add_argument('--batch_size', default=32, type=int) 
     parser.add_argument('--epochs', default=20, type=int) 
     parser.add_argument('--train_mode', default=False, type=bool)
+    parser.add_argument('--TSNE_plot', default=False, type=bool)
     
     # Mode-------
     parser.add_argument('--table', type=str, default='table7', help='table6, table7')
@@ -78,7 +79,8 @@ def train_table7(opt):
         emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, opt)
         X_train_embed, X_test_embed = emb_sys.get_emb()
         emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)
-        TSNE_plot(X_test_embed[:, :opt.embedding_size], y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.scaler}.png'))
+        if opt.TSNE_plot:
+            TSNE_plot(X_test_embed[:, :opt.embedding_size], y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.scaler}.png'))
 
     if opt.model == 'SDLM':
         y_test = one_hot(y_test)
@@ -98,7 +100,8 @@ def train_table7(opt):
         emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, opt)
         X_train_embed, X_test_embed = emb_sys.get_emb()
         emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)
-        TSNE_plot(X_test_embed, y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.scaler}.png'))
+        if opt.TSNE_plot:
+            TSNE_plot(X_test_embed, y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.scaler}.png'))
 
 
 if __name__ == '__main__':
