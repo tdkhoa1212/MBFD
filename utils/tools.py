@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.manifold import TSNE
 import os
 import scipy.io
 from os.path import join
@@ -21,6 +24,19 @@ from lightgbm import LGBMClassifier
 
 def scale_test(test_signals, scale):
   return scale.transform(test_signals)
+
+def TSNE_plot(x, y, title, save_path):
+  tsne = TSNE(n_components=2, verbose=1, random_state=123)
+  x = tsne.fit_transform(x) 
+  df = pd.DataFrame()
+  df["y"] = y
+  df["comp-1"] = z[:,0]
+  df["comp-2"] = z[:,1]
+
+  sns.scatterplot(x="comp-1", y="comp-2", hue=df.y.tolist(),
+                  palette=sns.color_palette("hls", 3),
+                  data=df).set(title=title) 
+  sns.savefig(save_path)
 
 def scaler_fit(train_signals, opt):
     '''
