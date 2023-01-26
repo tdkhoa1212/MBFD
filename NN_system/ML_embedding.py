@@ -15,6 +15,8 @@ class FaceNetOneShotRecognitor(object):
 
     def get_emb(self):
         # Scale data----------------------------------------
+        X_tra_e = self.X_train
+        X_te_e = self.X_test
         if self.opt.scaler != None:
             self.X_train, scale = scaler_fit(self.X_train, self.opt)
             self.X_test = scale_test(self.X_test, scale)
@@ -22,19 +24,23 @@ class FaceNetOneShotRecognitor(object):
         if self.opt.model == 'main_model':
             # Extract data--------------------------------------
             if self.opt.Ex_feature == 'time':
-                X_train_e = extracted_feature_of_signal(np.squeeze(self.X_train))
-                X_test_e = extracted_feature_of_signal(np.squeeze(self.X_test))
+                X_train_e = extracted_feature_of_signal(X_tra_e)
+                X_test_e = extracted_feature_of_signal(X_te_e)
             if self.opt.Ex_feature == 'fre':
-                X_train_e = handcrafted_features(np.squeeze(self.X_train))
-                X_test_e = handcrafted_features(np.squeeze(self.X_test))
+                X_train_e = handcrafted_features(X_tra_e)
+                X_test_e = handcrafted_features(X_te_e)
             if self.opt.Ex_feature == 'time_fre':
-                X_train_time_e = extracted_feature_of_signal(np.squeeze(self.X_train))
-                X_train_fre_e = handcrafted_features(np.squeeze(self.X_train))
+                X_train_time_e = extracted_feature_of_signal(X_tra_e)
+                X_train_fre_e = handcrafted_features(X_tra_e)
                 X_train_e = np.concatenate((X_train_time_e, X_train_fre_e), axis=-1)
 
-                X_test_time_e = extracted_feature_of_signal(np.squeeze(self.X_test))
-                X_test_fre_e = handcrafted_features(np.squeeze(self.X_test))
+                X_test_time_e = extracted_feature_of_signal(X_te_e)
+                X_test_fre_e = handcrafted_features(X_te_e)
                 X_test_e = np.concatenate((X_test_time_e, X_test_fre_e), axis=-1)
+            
+            if self.opt.scaler != None:
+                X_train_e, scale = scaler_fit(X_train_e, self.opt)
+                X_test_e = scale_test(X_test_e, scale)
             
             _, X_train_embed = self.model.predict([self.X_train, X_train_e])
             _soft_pred, X_test_embed = self.model.predict([self.X_test, X_test_e])

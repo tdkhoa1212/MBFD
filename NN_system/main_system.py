@@ -12,14 +12,10 @@ import numpy as np
 import tensorflow as tf
 from utils.angular_grad import AngularGrad
 
-def train_main_system(X_train, y_train, X_test, y_test, opt):
+def train_main_system(X_train, y_train, X_test, y_test, opt):   
     # Expand 1 channel for data ------------------------------
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
-    
-    if opt.scaler != None:
-        X_train, scale = scaler_fit(X_train, opt)
-        X_test = scale_test(X_test, scale)
 
     # Extract model ---------------------------------------------------------
     e_i_1 = Input((opt.e_input_shape, ), name='extracting_input_1')
@@ -52,7 +48,6 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     p_i = Input((opt.input_shape, 1), name='positive_input')
     n_i = Input((opt.input_shape, 1), name='negative_input')
     
-
     soft_a, logits_a = t_model([a_i])
     soft_p, logits_p = t_model([p_i])
     soft_n, logits_n = t_model([n_i])
@@ -67,33 +62,50 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         # ------------------------------------- GENERATE DATA ---------------------------------------------------------
         # Data of main branch
         X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
+        X_train_e =  X_train
+        
+        if opt.scaler != None:
+            X_train, scale_1 = scaler_fit(X_train, opt)
+            X_test = scale_test(X_test, scale)
+
         a_data = X_train[:, 0].reshape(-1, opt.input_shape, 1)
         p_data = X_train[:, 1].reshape(-1, opt.input_shape, 1)
         n_data = X_train[:, 2].reshape(-1, opt.input_shape, 1)
 
-        # Data of extract branch
+        a_data_e = X_train_e[:, 0]
+        p_data_e = X_train_e[:, 1]
+        n_data_e = X_train_e[:, 2]
+
         if opt.Ex_feature == 'time':
-            e_a_data = extracted_feature_of_signal(np.squeeze(a_data))
-            e_p_data = extracted_feature_of_signal(np.squeeze(p_data))
-            e_n_data = extracted_feature_of_signal(np.squeeze(n_data))
+            e_a_data = extracted_feature_of_signal(a_data_e)
+            e_p_data = extracted_feature_of_signal(p_data_e)
+            e_n_data = extracted_feature_of_signal(n_data_e)
+
 
         if opt.Ex_feature == 'fre':
-            e_a_data = handcrafted_features(np.squeeze(a_data))
-            e_p_data = handcrafted_features(np.squeeze(p_data))
-            e_n_data = handcrafted_features(np.squeeze(n_data))
+            e_a_data = handcrafted_features(a_data_e)
+            e_p_data = handcrafted_features(p_data_e)
+            e_n_data = handcrafted_features(n_data_e)
 
         if opt.Ex_feature == 'time_fre':
-            a_time   = extracted_feature_of_signal(np.squeeze(a_data))
-            p_time   = extracted_feature_of_signal(np.squeeze(p_data))
-            n_time   = extracted_feature_of_signal(np.squeeze(n_data))
+            a_time   = extracted_feature_of_signal(a_data_e)
+            p_time   = extracted_feature_of_signal(p_data_e)
+            n_time   = extracted_feature_of_signal(n_data_e)
 
-            a_fre   = handcrafted_features(np.squeeze(a_data))
-            p_fre   = handcrafted_features(np.squeeze(p_data))
-            n_fre   = handcrafted_features(np.squeeze(n_data))
+            a_fre   = handcrafted_features(a_data_e)
+            p_fre   = handcrafted_features(p_data_e)
+            n_fre   = handcrafted_features(n_data_e)
 
             e_a_data = np.concatenate((a_time, a_fre), axis=-1)
             e_p_data = np.concatenate((p_time, p_fre), axis=-1)
             e_n_data = np.concatenate((n_time, n_fre), axis=-1)
+
+        if opt.scaler != None:
+            length = len(e_a_data)
+            all_ = np.concatenate((e_a_data, e_p_data, e_n_data), axis=0)
+            all_, scale_2 = scaler_fit(all_, opt)
+            e_a_data, e_p_data, e_n_data = all_[:length, :], all_[length: length*2, :], all_[length*2: , :]
+        #-----------------------------------------------
 
         a_label = one_hot(y_train[:, 0])
         p_label = one_hot(y_train[:, 1])
