@@ -288,8 +288,7 @@ def train_U_SDLM_system(X_train, y_train, X_test, y_test, opt):
             else:
                 print('\n No weight file.')
 
-        model.compile(loss=["categorical_crossentropy",
-                    new_triplet_loss],
+        model.compile(loss=triplet_loss,
                     optimizer=tf.keras.optimizers.experimental.RMSprop(), 
                     metrics=["accuracy"])
 
@@ -297,7 +296,7 @@ def train_U_SDLM_system(X_train, y_train, X_test, y_test, opt):
         # y=[t_soft, c_data] c_data is just for afternative position for blank position
         # only use t_soft for softmax head in training process
         model.fit(x = [e_a_data, e_p_data, e_n_data], 
-                  y = None,
+                  y = e_a_data,
                   batch_size=opt.batch_size, 
                   epochs=opt.epochs, 
                 #   callbacks=[callback], 
@@ -306,7 +305,7 @@ def train_U_SDLM_system(X_train, y_train, X_test, y_test, opt):
         save(model, path)
 
     # ------------------------------------- TEST MODEL ---------------------------------------------------------
-    model = Model(inputs=[e_i_1], outputs=None)
+    model = Model(inputs=[e_i_1], outputs=e_o_1)
     model.load_weights(path)
     return model
     
