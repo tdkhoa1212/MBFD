@@ -5,8 +5,7 @@ from utils.PU import load_PU_table
 from utils.tools import scaler_fit, ML_models, scale_test, one_hot, TSNE_plot
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 from NN_system.ML_embedding import FaceNetOneShotRecognitor
-from NN_system.main_system import train_main_system
-from NN_system.S_SDLM_system import train_S_SDLM_system
+from NN_system.main_system import train_main_system, train_S_SDLM_system, train_U_SDLM_system
 from Networks.SDLM_model import SDLM
 from os.path import join
 
@@ -80,7 +79,7 @@ def train_table7(opt):
         X_train_embed, X_test_embed = emb_sys.get_emb()
         emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)
         if opt.TSNE_plot:
-            TSNE_plot(X_test_embed[:, :opt.embedding_size], y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.scaler}.png'))
+            TSNE_plot(X_test_embed[:, :opt.embedding_size], y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.model}_{opt.scaler}.png'))
 
     if opt.model == 'SDLM':
         y_test = one_hot(y_test)
@@ -101,8 +100,15 @@ def train_table7(opt):
         X_train_embed, X_test_embed = emb_sys.get_emb()
         emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)
         if opt.TSNE_plot:
-            TSNE_plot(X_test_embed, y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.scaler}.png'))
+            TSNE_plot(X_test_embed, y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.model}_{opt.scaler}.png'))
 
+    if opt.model == 'U_SDLM':
+        model = train_U_SDLM_system(X_train, y_train, X_test, y_test, opt)
+        emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, opt)
+        X_train_embed, X_test_embed = emb_sys.get_emb()
+        emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)
+        if opt.TSNE_plot:
+            TSNE_plot(X_test_embed, y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.model}_{opt.scaler}.png'))
 
 if __name__ == '__main__':
     opt = parse_opt()
@@ -111,4 +117,4 @@ if __name__ == '__main__':
         train_table6(opt)
     if opt.table == 'table7':
         train_table7(opt)
-    
+        

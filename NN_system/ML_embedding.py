@@ -49,7 +49,7 @@ class FaceNetOneShotRecognitor(object):
         print('\n Test embs shape: ', test_embs.shape)
         print('Train embs shape: ', train_embs.shape)
         
-        if ML_method == 'Euclidean' or ML_method == 'Cosine':
+        if ML_method == 'euclidean' or ML_method == 'cosine':
             print(f'Classification method: {ML_method}')
             test_pred = []
 
@@ -82,15 +82,13 @@ class FaceNetOneShotRecognitor(object):
                             distances.append(euclidean(train_mean, test_mean) + euclidean(train_var, test_var)) # append one value
                         elif ML_method == 'cosine':
                             distances.append(cosine(train_mean, test_mean) + cosine(train_var, test_var))
-
-                    test_pred.append(np.argsort(distances)[0])
                 else:
                     for j in range(train_embs.shape[0]):
                         if ML_method == 'euclidean':
                             distances.append(euclidean(test_embs[i].reshape(-1), train_embs[j])) # append one value
                         elif ML_method == 'cosine':
                             distances.append(cosine(test_embs[i].reshape(-1), train_embs[j]))
-                    test_pred.append(np.argsort(distances)[0])   
+                test_pred.append(self.y_train[np.argsort(distances)[0]])   
 
             print(f"\nTEST ACCURACY: {accuracy_score(test_pred, self.y_test)}\n")   
         else:

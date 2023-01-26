@@ -128,3 +128,6 @@ def one_hot(label):
   for idx, val in enumerate(label):
     new_label[idx, val] = 1
   return new_label
+    
+    
+    
