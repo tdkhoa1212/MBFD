@@ -13,25 +13,26 @@ import tensorflow as tf
 from utils.angular_grad import AngularGrad
 
 def train_main_system(X_train, y_train, X_test, y_test, opt):
-    if opt.scaler != None:
-        X_train, scale = scaler_fit(X_train, opt)
-        X_test = scale_test(X_test, scale)
     # Expand 1 channel for data ------------------------------
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
+    
+    if opt.scaler != None:
+        X_train, scale = scaler_fit(X_train, opt)
+        X_test = scale_test(X_test, scale)
 
     # Extract model ---------------------------------------------------------
-    e_i_1 = Input((11, ), name='extracting_input_1')
+    e_i_1 = Input((opt.e_input_shape, ), name='extracting_input_1')
     e_o_1  = U_SDLM(e_i_1, opt)
     e_model_1 = Model(inputs=[e_i_1], outputs=[e_o_1])
     e_y_1 = e_model_1([e_i_1])
 
-    e_i_2 = Input((11, ), name='extracting_input_2')
+    e_i_2 = Input((opt.e_input_shape, ), name='extracting_input_2')
     e_o_2  = U_SDLM(e_i_2, opt)
     e_model_2 = Model(inputs=[e_i_2], outputs=[e_o_2])
     e_y_2 = e_model_2([e_i_2])
     
-    e_i_3 = Input((11, ), name='extracting_input_3')
+    e_i_3 = Input((opt.e_input_shape, ), name='extracting_input_3')
     e_o_3  = U_SDLM(e_i_3, opt)
     e_model_3 = Model(inputs=[e_i_3], outputs=[e_o_3])
     e_y_3 = e_model_3([e_i_3])
@@ -215,17 +216,17 @@ def train_U_SDLM_system(X_train, y_train, X_test, y_test, opt):
     X_test = np.expand_dims(X_test, axis=-1)
 
     # Extract model ---------------------------------------------------------
-    e_i_1 = Input((11, ), name='extracting_input_1')
+    e_i_1 = Input((opt.e_input_shape, ), name='extracting_input_1')
     e_o_1  = U_SDLM(e_i_1, opt)
     e_model_1 = Model(inputs=[e_i_1], outputs=[e_o_1])
     e_y_1 = e_model_1([e_i_1])
 
-    e_i_2 = Input((11, ), name='extracting_input_2')
+    e_i_2 = Input((opt.e_input_shape, ), name='extracting_input_2')
     e_o_2  = U_SDLM(e_i_2, opt)
     e_model_2 = Model(inputs=[e_i_2], outputs=[e_o_2])
     e_y_2 = e_model_2([e_i_2])
     
-    e_i_3 = Input((11, ), name='extracting_input_3')
+    e_i_3 = Input((opt.e_input_shape, ), name='extracting_input_3')
     e_o_3  = U_SDLM(e_i_3, opt)
     e_model_3 = Model(inputs=[e_i_3], outputs=[e_o_3])
     e_y_3 = e_model_3([e_i_3])

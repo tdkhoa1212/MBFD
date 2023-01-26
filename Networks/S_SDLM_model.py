@@ -62,7 +62,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = Activation('relu')(x)
     return x
 
-def S_SDLM(input_, opt, backbone=False):
+def S_SDLM(input_, opt):
     '''
     The model was rebuilt based on the construction of resnet 34 and inherited from this source code:
     https://github.com/philipperemy/very-deep-convnets-raw-waveforms/blob/master/model_resnet.py
@@ -92,9 +92,6 @@ def S_SDLM(input_, opt, backbone=False):
     x2 = TransformerLayer(x=x, c=96)
     x = concatenate([x1, x2], axis=-1)
 
-    if backbone:
-        return x
- 
     x = Dense(opt.embedding_size)(x)
     x = BatchNormalization()(x)
     # logit = x 
