@@ -7,25 +7,22 @@ import tensorflow.keras.backend as K
 from tensorflow.keras import layers, regularizers
 from tensorflow.keras.models import Model
 
-def TransformerLayer(x=None, c=48, num_heads=12):
-    # Transformer layer https://arxiv.org/abs/2010.11929 (LayerNorm layers removed for better performance)
-    x   = Dense(c, use_bias=True, 
+def TransformerLayer(x=None, c=48, num_heads=4):
+    q   = Dense(c, use_bias=True, 
                   kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                   bias_regularizer=regularizers.l2(1e-4),
                   activity_regularizer=regularizers.l2(1e-5))(x)
-    x = Dropout(0.2)(x)   
-    ma  = MultiHeadAttention(head_size=c, num_heads=num_heads)([x, x, x])
-    x = Dense(c, use_bias=True, 
+    k   = Dense(c, use_bias=True, 
                   kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                   bias_regularizer=regularizers.l2(1e-4),
-                  activity_regularizer=regularizers.l2(1e-5))(ma) 
-    x = Dropout(0.2)(x)                       
-    x = Dense(c, use_bias=True, 
+                  activity_regularizer=regularizers.l2(1e-5))(x)
+    v   = Dense(c, use_bias=True, 
                   kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                   bias_regularizer=regularizers.l2(1e-4),
-                  activity_regularizer=regularizers.l2(1e-5))(x) 
-    x = Dropout(0.2)(x)
-    return x
+                  activity_regularizer=regularizers.l2(1e-5))(x)
+    ma  = MultiHeadAttention(head_size=c, num_heads=num_heads)([q, k, v]) 
+    return ma
+
     
 # For m34 Residual, use RepeatVector. Or tensorflow backend.repeat
 def identity_block(input_tensor, kernel_size, filters, stage, block):
