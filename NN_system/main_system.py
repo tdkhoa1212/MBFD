@@ -220,9 +220,6 @@ def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     return model
 
 def train_U_SDLM_system(X_train, y_train, X_test, y_test, opt):
-    if opt.scaler != None:
-        X_train, scale = scaler_fit(X_train, opt)
-        X_test = scale_test(X_test, scale)
     # Expand 1 channel for data ------------------------------
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
@@ -278,6 +275,12 @@ def train_U_SDLM_system(X_train, y_train, X_test, y_test, opt):
             e_a_data = np.concatenate((a_time, a_fre), axis=-1)
             e_p_data = np.concatenate((p_time, p_fre), axis=-1)
             e_n_data = np.concatenate((n_time, n_fre), axis=-1)
+            
+        if opt.scaler != None:
+            length = len(e_a_data)
+            all_ = np.concatenate((e_a_data, e_p_data, e_n_data), axis=0)
+            all_, scale_2 = scaler_fit(all_, opt)
+            e_a_data, e_p_data, e_n_data = all_[:length, :], all_[length: length*2, :], all_[length*2: , :]
 
         model = Model(inputs=[e_i_1, e_i_2, e_i_3], outputs= m_logit)
         model.summary()

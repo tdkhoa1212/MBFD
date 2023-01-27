@@ -40,7 +40,7 @@ class FaceNetOneShotRecognitor(object):
         if self.opt.scaler != None:
             X_train_e, scale = scaler_fit(X_train_e, self.opt)
             X_test_e = scale_test(X_test_e, scale)
-            
+     
         if self.opt.model == 'main_model':
             _, X_train_embed = self.model.predict([self.X_train, X_train_e])
             _soft_pred, X_test_embed = self.model.predict([self.X_test, X_test_e]) 
@@ -50,8 +50,8 @@ class FaceNetOneShotRecognitor(object):
             _soft_pred, X_test_embed = self.model.predict([self.X_test])
 
         if self.opt.model == 'U_SDLM':
-            _, X_train_embed = self.model.predict([X_train_e])
-            _soft_pred, X_test_embed = self.model.predict([X_train_e])
+            X_train_embed = self.model.predict([X_train_e])
+            X_test_embed = self.model.predict([X_test_e])
 
         return X_train_embed, X_test_embed
       
