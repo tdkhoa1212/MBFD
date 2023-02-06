@@ -1,7 +1,7 @@
 from tensorflow.keras.layers import Conv1D, Activation, \
                                     Dense, BatchNormalization, \
                                     Lambda, MaxPooling1D, GlobalAveragePooling1D, \
-                                    Input, concatenate, Dropout
+                                    Input, concatenate, Layer
 from tensorflow_addons.layers import MultiHeadAttention
 import tensorflow.keras.backend as K
 from tensorflow.keras import layers, regularizers
@@ -93,7 +93,7 @@ def SDLM(opt):
     # Two heads of transformer layers----------------------------
     x1 = TransformerLayer(x=x, c=96)
     x2 = TransformerLayer(x=x, c=96)
-    x = concatenate([x1, x2], axis=-1)
+    x = Layer(concatenate([x1, x2], axis=-1), name='Un_output')
     x = Dense(opt.num_classes, activation='softmax')(x)
 
     m = Model(inputs, x, name='SDLM_model')

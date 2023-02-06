@@ -8,6 +8,7 @@ from NN_system.ML_embedding import FaceNetOneShotRecognitor
 from NN_system.main_system import train_main_system, train_S_SDLM_system, train_U_SDLM_system
 from Networks.SDLM_model import SDLM
 from os.path import join
+from tf.keras.models import Model
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -34,11 +35,12 @@ def parse_opt(known=False):
     parser.add_argument('--batch_size', default=32, type=int) 
     parser.add_argument('--epochs', default=20, type=int) 
     parser.add_argument('--train_mode', default=False, type=bool)
-    parser.add_argument('--TSNE_plot', default=False, type=bool)
+    parser.add_argument('--get_SDLM_extract', default=True, type=bool)
+    parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
     
     # Mode-------
     parser.add_argument('--table', type=str, default='table7', help='table6, table7')
-    parser.add_argument('--model', type=str, default='S_SDLM', help='main_model, SDLM, S_SDLM, U_SDLM')
+    parser.add_argument('--model', type=str, default='SDLM', help='main_model, SDLM, S_SDLM, U_SDLM')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
@@ -92,8 +94,15 @@ def train_table7(opt):
                             epochs     = opt.epochs,
                             batch_size = opt.batch_size,
                             validation_data=(X_test, y_test),)
-        _, test_acc = model.evaluate(X_test, y_test, verbose=0)
-        print('\n' + '*'*20 + f' Test accuracy: {test_acc}' + '*'*20)
+        if opt.get_SDLM_extract:
+            model = Model(inputs=model.inputs,
+                          outputs=model.get_layer(name="Un_output").output)
+            emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, opt)
+            X_train_embed, X_test_embed = emb_sys.get_emb()
+            emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)
+        else:
+            _, test_acc = model.evaluate(X_test, y_test, verbose=0)
+            print('\n' + '*'*20 + f' Test accuracy: {test_acc}' + '*'*20)
     
     if opt.model == 'S_SDLM':
         model = train_S_SDLM_system(X_train, y_train, X_test, y_test, opt)
