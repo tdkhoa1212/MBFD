@@ -93,7 +93,7 @@ def SDLM(opt):
     # Two heads of transformer layers----------------------------
     x1 = TransformerLayer(x=x, c=96)
     x2 = TransformerLayer(x=x, c=96)
-    x = Layer(concatenate([x1, x2], axis=-1), name='Un_output')
+    x = concatenate([x1, x2], axis=-1, name='Un_output')
     x = Dense(opt.num_classes, activation='softmax')(x)
 
     m = Model(inputs, x, name='SDLM_model')
