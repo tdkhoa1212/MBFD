@@ -2,13 +2,13 @@ import argparse
 import numpy as np
 from Networks.SDLM_model import SDLM
 from utils.PU import load_PU_table
-from utils.tools import scaler_fit, ML_models, scale_test, one_hot, TSNE_plot
+from utils.tools import scaler_fit, ML_models, scale_test, one_hot, TSNE_plot, one_hot_inverse
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 from NN_system.ML_embedding import FaceNetOneShotRecognitor
 from NN_system.main_system import train_main_system, train_S_SDLM_system, train_U_SDLM_system
 from Networks.SDLM_model import SDLM
 from os.path import join
-from tf.keras.models import Model
+from tensorflow.keras.models import Model
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -90,13 +90,23 @@ def train_table7(opt):
         model = SDLM(opt)
         model.compile(optimizer="Adam", loss='categorical_crossentropy', metrics=['acc']) # loss='mse'
         model.summary()
-        history = model.fit(X_train, y_train,
-                            epochs     = opt.epochs,
-                            batch_size = opt.batch_size,
-                            validation_data=(X_test, y_test),)
+        weight_path = join(opt.weights_path, opt.model)
+
+        if opt.load_weights:
+          model.load_weights(weight_path)
+        else:
+          history = model.fit(X_train, y_train,
+                              epochs     = opt.epochs,
+                              batch_size = opt.batch_size,
+                              validation_data=(X_test, y_test),)
+          print("\nSave weights sucessful!")
+          print(f"Path {weight_path}\n")
+          model.save(weight_path)
         if opt.get_SDLM_extract:
             model = Model(inputs=model.inputs,
                           outputs=model.get_layer(name="Un_output").output)
+            y_train = one_hot_inverse(y_train)
+            y_test = one_hot_inverse(y_test)
             emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, opt)
             X_train_embed, X_test_embed = emb_sys.get_emb()
             emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)

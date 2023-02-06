@@ -49,6 +49,10 @@ class FaceNetOneShotRecognitor(object):
             _, X_train_embed = self.model.predict([self.X_train])
             _soft_pred, X_test_embed = self.model.predict([self.X_test])
 
+        if self.opt.get_SDLM_extract:
+            X_train_embed = self.model.predict([self.X_train])
+            X_test_embed = self.model.predict([self.X_test])
+
         if self.opt.model == 'U_SDLM':
             X_train_embed = self.model.predict([X_train_e])
             X_test_embed = self.model.predict([X_test_e])

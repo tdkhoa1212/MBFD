@@ -128,6 +128,12 @@ def one_hot(label):
   for idx, val in enumerate(label):
     new_label[idx, val] = 1
   return new_label
+
+def one_hot_inverse(label):
+  label_1D = []
+  for i in label:
+    label_1D.append(np.argmax(i))
+  return np.array(label_1D)
     
     
     
