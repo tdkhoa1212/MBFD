@@ -115,7 +115,7 @@ class AudioFeatureExtractor:
         self.hop_ratio = hop_ratio
         self.hop_length = int(self.frame_length / self.hop_ratio)
         self.bin_frequencies = librosa.fft_frequencies(
-            self.sr,
+            sr = self.sr,
             n_fft=self.frame_length)
 
         # ---------
@@ -638,9 +638,9 @@ class AudioFeatureExtractor:
 
 def handcrafted_features(signals):
     data = []
-    afe = AudioFeatureExtractor(400, 200, 1) # 22050, 1024, 4
+    afe = AudioFeatureExtractor(400, 200, 1) # 22050, 1024, 4   400, 200, 1
     for i in signals:
-        extract_rms = afe.extract_rms(i)
+        extract_rms                = afe.extract_rms(i)
         extract_spectral_centroid  = afe.extract_spectral_centroid(i)
         extract_spectral_bandwidth = afe.extract_spectral_bandwidth(i)
         extract_spectral_flatness  = afe.extract_spectral_flatness(i)

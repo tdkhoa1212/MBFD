@@ -40,7 +40,7 @@ def generate_triplet(x, y,  ap_pairs=16, an_pairs=16):
     return np.array(triplet_train_pairs), np.array(y_triplet_pairs)
 
     
-def new_triplet_loss(y_true, y_pred, alpha=0.2, lambda_=0.4):
+def new_triplet_loss(y_true, y_pred, alpha=0.2, lambda_=0.4, embedding_size=256):
     """
     Implementation of the triplet loss function
     Arguments:
@@ -54,17 +54,17 @@ def new_triplet_loss(y_true, y_pred, alpha=0.2, lambda_=0.4):
     """
     total_lenght = y_pred.shape.as_list()[-1]
 
-    anchor   = y_pred[:, 0: opt.embedding_size]
-    anchor_extract   = y_pred[:, opt.embedding_size: opt.embedding_size*2]
+    anchor   = y_pred[:, 0: embedding_size]
+    anchor_extract   = y_pred[:, embedding_size: embedding_size*2]
 
-    positive = y_pred[:, opt.embedding_size*2: opt.embedding_size*3]
-    positive_extract = y_pred[:, opt.embedding_size*3: opt.embedding_size*4]
+    positive = y_pred[:, embedding_size*2: embedding_size*3]
+    positive_extract = y_pred[:, embedding_size*3: embedding_size*4]
 
-    negative = y_pred[:, opt.embedding_size*4: opt.embedding_size*5]
-    negative_extract = y_pred[:, opt.embedding_size*5: opt.embedding_size*6]
+    negative = y_pred[:, embedding_size*4: embedding_size*5]
+    negative_extract = y_pred[:, embedding_size*5: embedding_size*6]
 
-    y_center = y_pred[:, opt.embedding_size*6: opt.embedding_size*7]
-    y_center_extract = y_pred[:, opt.embedding_size*7:]
+    y_center = y_pred[:, embedding_size*6: embedding_size*7]
+    y_center_extract = y_pred[:, embedding_size*7:]
     
     # Extract branch loss----------------------------------
     pos_extract_dist  = K.sum(K.square(anchor_extract - positive_extract), axis=1)

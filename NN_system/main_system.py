@@ -66,7 +66,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         
         if opt.scaler != None:
             X_train, scale_1 = scaler_fit(X_train, opt)
-            X_test = scale_test(X_test, scale)
+            X_test = scale_test(X_test, scale_1)
 
         a_data = X_train[:, 0].reshape(-1, opt.input_shape, 1)
         p_data = X_train[:, 1].reshape(-1, opt.input_shape, 1)
@@ -76,25 +76,26 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         p_data_e = X_train_e[:, 1]
         n_data_e = X_train_e[:, 2]
 
+        # Data of extract branch
         if opt.Ex_feature == 'time':
-            e_a_data = extracted_feature_of_signal(a_data_e)
-            e_p_data = extracted_feature_of_signal(p_data_e)
-            e_n_data = extracted_feature_of_signal(n_data_e)
-
+            e_a_data = extracted_feature_of_signal(np.squeeze(a_data))
+            e_p_data = extracted_feature_of_signal(np.squeeze(p_data))
+            e_n_data = extracted_feature_of_signal(np.squeeze(n_data))
 
         if opt.Ex_feature == 'fre':
-            e_a_data = handcrafted_features(a_data_e)
-            e_p_data = handcrafted_features(p_data_e)
-            e_n_data = handcrafted_features(n_data_e)
+            print("\n" + f"{a_data.shape}" + "\n")
+            e_a_data = handcrafted_features(np.squeeze(a_data))
+            e_p_data = handcrafted_features(np.squeeze(p_data))
+            e_n_data = handcrafted_features(np.squeeze(n_data))
 
         if opt.Ex_feature == 'time_fre':
-            a_time   = extracted_feature_of_signal(a_data_e)
-            p_time   = extracted_feature_of_signal(p_data_e)
-            n_time   = extracted_feature_of_signal(n_data_e)
+            a_time   = extracted_feature_of_signal(np.squeeze(a_data))
+            p_time   = extracted_feature_of_signal(np.squeeze(p_data))
+            n_time   = extracted_feature_of_signal(np.squeeze(n_data))
 
-            a_fre   = handcrafted_features(a_data_e)
-            p_fre   = handcrafted_features(p_data_e)
-            n_fre   = handcrafted_features(n_data_e)
+            a_fre   = handcrafted_features(np.squeeze(a_data))
+            p_fre   = handcrafted_features(np.squeeze(p_data))
+            n_fre   = handcrafted_features(np.squeeze(n_data))
 
             e_a_data = np.concatenate((a_time, a_fre), axis=-1)
             e_p_data = np.concatenate((p_time, p_fre), axis=-1)
