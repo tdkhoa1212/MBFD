@@ -70,16 +70,16 @@ def new_triplet_loss(y_true, y_pred, alpha=0.3, lambda_=0.4, embedding_size=256)
     pos_extract_dist  = K.sum(K.square(anchor_extract - positive_extract), axis=1)
     neg_extract_dist  = K.sum(K.square(anchor_extract - negative_extract), axis=1)
     out_extract_l2    = K.sum(K.square(anchor_extract - y_center_extract), axis=1) 
-    loss_extract  = K.maximum(lambda_*(pos_extract_dist + out_extract_l2) + lambda_ - neg_extract_dist, 0.0)
+    loss_extract  = K.maximum(lambda_*(pos_extract_dist + out_extract_l2) + alpha - neg_extract_dist, 0.0)
 
     # Main branch loss----------------------------------
     pos_dist          = K.sum(K.square(anchor - positive), axis=1)
     neg_dist          = K.sum(K.square(anchor - negative), axis=1)
     out_l2     = K.sum(K.square(anchor - y_center), axis=1) 
-    loss       = K.maximum(lambda_*(pos_dist + out_l2) + lambda_ - neg_dist, 0.0)
+    loss       = K.maximum(lambda_*(pos_dist + out_l2) + alpha - neg_dist, 0.0)
     
     # Final loss------------------------
-    f_loss = loss + alpha*loss_extract
+    f_loss = loss + 0.3*loss_extract
     return f_loss
 
 def magnitudes(x):
