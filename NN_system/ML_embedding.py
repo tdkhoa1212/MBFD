@@ -2,13 +2,15 @@ from scipy.spatial.distance import cosine, euclidean
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import accuracy_score
-from utils.tools import ML_models, scaler_fit, scale_test
+from utils.tools import ML_models, scaler_fit, scale_test, scaler_tripdata
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 
 
+
 class FaceNetOneShotRecognitor(object):
-    def __init__(self, X_train, y_train, X_test, y_test, model, opt):
+    def __init__(self, X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt):
         self.opt = opt
+        self.scale_1, self.scale_2 = scale_1, scale_2
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test   = X_test, y_test
         self.model = model
@@ -18,8 +20,8 @@ class FaceNetOneShotRecognitor(object):
         X_tra_e = self.X_train
         X_te_e = self.X_test
         if self.opt.scaler != None:
-            self.X_train, scale = scaler_fit(self.X_train, self.opt)
-            self.X_test = scale_test(self.X_test, scale)
+            self.X_train = scale_test(self.X_train, self.scale_1)
+            self.X_test = scale_test(self.X_test, self.scale_1)
 
         # Extract data--------------------------------------
         if self.opt.Ex_feature == 'time':
@@ -38,8 +40,8 @@ class FaceNetOneShotRecognitor(object):
             X_test_e = np.concatenate((X_test_time_e, X_test_fre_e), axis=-1)
         
         if self.opt.scaler != None:
-            X_train_e, scale = scaler_fit(X_train_e, self.opt)
-            X_test_e = scale_test(X_test_e, scale)
+            X_train_e = scale_test(X_train_e, self.scale_2)
+            X_test_e = scale_test(X_test_e, self.scale_2)
      
         if self.opt.model == 'main_model':
             _, X_train_embed = self.model.predict([self.X_train, X_train_e])
@@ -106,4 +108,4 @@ class FaceNetOneShotRecognitor(object):
 
             print(f"\nTEST ACCURACY: {accuracy_score(test_pred, self.y_test)}\n")   
         else:
-            ML_models(self.X_train, self.y_train, self.X_test, self.y_test, self.opt)
+            ML_models(self.X_train, self.y_train, self.X_test, self.y_test, ML_method)

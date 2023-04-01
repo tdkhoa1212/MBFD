@@ -9,18 +9,19 @@ from NN_system.main_system import train_main_system, train_S_SDLM_system, train_
 from Networks.SDLM_model import SDLM
 from os.path import join
 from tensorflow.keras.models import Model
+import tensorflow as tf
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
     
     # Models and denoising methods--------------------------
-    parser.add_argument('--ML_method', default='SVM' , type=str, help='SVM, RF, KNN, LGBM, euclidean, cosine')
-    parser.add_argument('--scaler', default=None, type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
+    parser.add_argument('--ML_method', default=['RF', 'KNN', 'LGBM', 'euclidean', 'cosine', 'SVM']  , type=list, help='SVM, RF, KNN, LGBM, euclidean, cosine')
+    parser.add_argument('--scaler', default="PowerTransformer", type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
     parser.add_argument('--type_data', type=str, default='vibration', help='vibration, MCS1, MCS2')
-    parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data', help='direction of data')
-    parser.add_argument('--weights_path', type=str, default='/content/drive/MyDrive/Khoa/vibration_project/Classification/results', help='direction of data')
-    parser.add_argument('--img_outdir', type=str, default='/content/drive/MyDrive/Khoa/vibration_project/Classification/results/images', help='direction of data')
-    parser.add_argument('--load_weights', default=False, type=bool)
+    parser.add_argument('--data_dir', type=str, default='./data/PU_data', help='direction of data')
+    parser.add_argument('--weights_path', type=str, default='./results', help='direction of data')
+    parser.add_argument('--img_outdir', type=str, default='./results/images', help='direction of data')
+    parser.add_argument('--load_weights', default=True, type=bool)
     parser.add_argument('--Ex_feature', type=str, default='fre', help='time, fre, time_fre')
     parser.add_argument('--PU_table_8', default=True, type=bool)
     parser.add_argument('--PU_table_10', default=False, type=bool)
@@ -32,15 +33,15 @@ def parse_opt(known=False):
     parser.add_argument('--e_input_shape', default=6270, type=int, help='11, 6270, 6281') 
     parser.add_argument('--input_shape', default=250604, type=int)  
     parser.add_argument('--num_classes', default=3, type=int) 
-    parser.add_argument('--batch_size', default=32, type=int) 
-    parser.add_argument('--epochs', default=20, type=int) 
-    parser.add_argument('--train_mode', default=False, type=bool)
-    parser.add_argument('--get_SDLM_extract', default=True, type=bool)
+    parser.add_argument('--batch_size', default=16, type=int) 
+    parser.add_argument('--epochs', default=30, type=int) 
+    parser.add_argument('--train_mode', default=True, type=bool)
+    parser.add_argument('--get_SDLM_extract', default=False, type=bool)
     parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
     
     # Mode-------
     parser.add_argument('--table', type=str, default='table7', help='table6, table7')
-    parser.add_argument('--model', type=str, default='SDLM', help='main_model, SDLM, S_SDLM, U_SDLM')
+    parser.add_argument('--model', type=str, default='main_model', help='main_model, SDLM, S_SDLM, U_SDLM')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
@@ -75,14 +76,18 @@ def train_table7(opt):
     X_train, y_train, X_test, y_test = load_PU_table(opt)
     print('\n' + f'Shape of original training data: {X_train.shape, y_train.shape}')
     print(f'Shape of original test data: {X_test.shape, y_test.shape}' + '\n')
-
+    model, scale_1, scale_2 = train_main_system(X_train, y_train, X_test, y_test, opt)
+    emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
+    X_train_embed, X_test_embed = emb_sys.get_emb()
+    
     if opt.model == 'main_model':
-        model = train_main_system(X_train, y_train, X_test, y_test, opt)
-        emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, opt)
-        X_train_embed, X_test_embed = emb_sys.get_emb()
-        emb_sys.predict(X_test_embed, X_train_embed, ML_method=opt.ML_method, use_mean_var=False)
-        if opt.TSNE_plot:
-            TSNE_plot(X_test_embed[:, :opt.embedding_size], y_test, f'Test data with {opt.scaler}', join(opt.weights_path, 'image/', f'{opt.model}_{opt.scaler}.png'))
+        for each_ML in opt.ML_method:
+            tf.keras.backend.clear_session()
+            print("-"*10 + each_ML + "-"*10)
+            emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False)
+            if opt.TSNE_plot:
+                TSNE_plot(X_test_embed[:, :opt.embedding_size], y_test, f'Test data with {opt.scaler} and {each_ML}', join(opt.weights_path, 'images/', f'{opt.model}_{opt.scaler}_{each_ML}.png'))
+            print("-"*20, '\n')
 
     if opt.model == 'SDLM':
         y_test = one_hot(y_test)

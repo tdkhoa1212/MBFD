@@ -40,7 +40,7 @@ def generate_triplet(x, y,  ap_pairs=16, an_pairs=16):
     return np.array(triplet_train_pairs), np.array(y_triplet_pairs)
 
     
-def new_triplet_loss(y_true, y_pred, alpha=0.2, lambda_=0.4, embedding_size=256):
+def new_triplet_loss(y_true, y_pred, alpha=0.3, lambda_=0.4, embedding_size=256):
     """
     Implementation of the triplet loss function
     Arguments:

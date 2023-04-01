@@ -4,19 +4,18 @@ from Networks.S_SDLM_model import S_SDLM
 from Networks.U_SDLM_model import U_SDLM
 from utils.triplet import new_triplet_loss, generate_triplet, triplet_loss
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
-from utils.tools import one_hot, scaler_fit, scale_test
+from utils.tools import one_hot, scaler_fit, scale_test, scaler_tripdata
 from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
 import numpy as np
 import tensorflow as tf
 from utils.angular_grad import AngularGrad
+from pickle import dump, load
+from os.path import exists
+
 
 def train_main_system(X_train, y_train, X_test, y_test, opt):   
-    # Expand 1 channel for data ------------------------------
-    X_train = np.expand_dims(X_train, axis=-1)
-    X_test = np.expand_dims(X_test, axis=-1)
-
     # Extract model ---------------------------------------------------------
     e_i_1 = Input((opt.e_input_shape, ), name='extracting_input_1')
     e_o_1  = U_SDLM(e_i_1, opt)
@@ -60,13 +59,13 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
 
     if opt.train_mode:
         # ------------------------------------- GENERATE DATA ---------------------------------------------------------
+        # # Expand 1 channel for data ------------------------------
+        # X_train = np.expand_dims(X_train, axis=-1)
+        # X_test = np.expand_dims(X_test, axis=-1)
+
         # Data of main branch
         X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
         X_train_e =  X_train
-        
-        if opt.scaler != None:
-            X_train, scale_1 = scaler_fit(X_train, opt)
-            X_test = scale_test(X_test, scale_1)
 
         a_data = X_train[:, 0].reshape(-1, opt.input_shape, 1)
         p_data = X_train[:, 1].reshape(-1, opt.input_shape, 1)
@@ -75,6 +74,14 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         a_data_e = X_train_e[:, 0]
         p_data_e = X_train_e[:, 1]
         n_data_e = X_train_e[:, 2]
+
+        if opt.scaler != None:
+            if exists(f'./results/{opt.scaler}_scale_1.pkl'):
+                scale_1 = load(open(f'./results/{opt.scaler}_scale_1.pkl', 'rb'))
+            else:
+                a_data_e, p_data_e, n_data_e, scale_1 = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
+                X_test = scale_test(X_test, scale_1)
+                dump(scale_1, open(f'./results/{opt.scaler}_scale_1.pkl', 'wb'))
 
         # Data of extract branch
         if opt.Ex_feature == 'time':
@@ -102,10 +109,11 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
             e_n_data = np.concatenate((n_time, n_fre), axis=-1)
 
         if opt.scaler != None:
-            length = len(e_a_data)
-            all_ = np.concatenate((e_a_data, e_p_data, e_n_data), axis=0)
-            all_, scale_2 = scaler_fit(all_, opt)
-            e_a_data, e_p_data, e_n_data = all_[:length, :], all_[length: length*2, :], all_[length*2: , :]
+            if exists(f'./results/{opt.scaler}_scale_2.pkl'):
+                scale_2 = load(open(f'./results/{opt.scaler}_scale_2.pkl', 'rb'))
+            else:
+                e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
+                dump(scale_2, open(f'./results/{opt.scaler}_scale_2.pkl', 'wb'))
         #-----------------------------------------------
 
         a_label = one_hot(y_train[:, 0])
@@ -141,11 +149,13 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
                   shuffle=True)
 
         save(model, path)
-
+    else:
+        scale_1 = load(open(f'./results/{opt.scaler}_scale_1.pkl', 'rb'))
+        scale_2 = load(open(f'./results/{opt.scaler}_scale_2.pkl', 'rb'))
     # ------------------------------------- TEST MODEL ---------------------------------------------------------
     model = Model(inputs=[a_i, e_i_1], outputs=[soft_a, logits_a])
     model.load_weights(path)
-    return model
+    return model, scale_1, scale_2
 
 def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     if opt.scaler != None:

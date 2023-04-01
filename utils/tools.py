@@ -21,6 +21,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from lightgbm import LGBMClassifier
+import matplotlib 
+import matplotlib.pyplot as plt
+matplotlib.use('Agg')
 
 def scale_test(test_signals, scale):
   return scale.transform(test_signals)
@@ -36,7 +39,15 @@ def TSNE_plot(x, y, title, save_path):
   sns.scatterplot(x="comp-1", y="comp-2", hue=df.y.tolist(),
                   palette=sns.color_palette("hls", 3),
                   data=df).set(title=title) 
-  sns.savefig(save_path)
+  plt.savefig(save_path)
+
+
+def scaler_tripdata(a, p, n, opt):
+    length = len(a)
+    all_ = np.concatenate((a, p, n), axis=0)
+    all_, scale = scaler_fit(all_, opt)
+    return  all_[:length, :], all_[length: length*2, :], all_[length*2: , :], scale
+
 
 def scaler_fit(train_signals, opt):
     '''
@@ -62,18 +73,18 @@ def scaler_fit(train_signals, opt):
     train_data = scale.transform(train_signals)
     return train_data, scale
 
-def ML_models(X_train, y_train, X_test, y_test, opt):
+def ML_models(X_train, y_train, X_test, y_test, ML_method):
     '''
     X_train, X_test: matrices
     y_train, y_test: matrices (onehot)
     '''
-    if opt.ML_method == 'SVM': # SVM, RandomForestClassifier, LogisticRegression, GaussianNB
+    if ML_method == 'SVM': # SVM, RandomForestClassifier, LogisticRegression, GaussianNB
       model = SVC(kernel='rbf', probability=True)
-    if opt.ML_method == 'RF':
+    if ML_method == 'RF':
       model = RandomForestClassifier()
-    if opt.ML_method == 'KNN':     
+    if ML_method == 'KNN':     
       model = KNeighborsClassifier()
-    if opt.ML_method == 'LGBM':
+    if ML_method == 'LGBM':
       model = LGBMClassifier()
     
     model.fit(X_train, y_train)
