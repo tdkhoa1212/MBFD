@@ -73,7 +73,7 @@ def scaler_fit(train_signals, opt):
     train_data = scale.transform(train_signals)
     return train_data, scale
 
-def ML_models(X_train, y_train, X_test, y_test, ML_method):
+def ML_models(X_train, y_train, X_test, y_test, ML_method, get_acc=False):
     '''
     X_train, X_test: matrices
     y_train, y_test: matrices (onehot)
@@ -89,6 +89,8 @@ def ML_models(X_train, y_train, X_test, y_test, ML_method):
     
     model.fit(X_train, y_train)
     y_test_pred = model.predict(X_test)
+    if get_acc:
+      return y_test_pred
     print(f"\nTEST ACCURACY: {accuracy_score(y_test, y_test_pred)}\n")
 
 def load_PU_data(path, opt):
@@ -133,6 +135,24 @@ def load_table_10(path):
       
   return np.expand_dims(all_data, axis=0)
 
+def load_table_10_spe(data, label):
+  new_data = []
+  new_label = []
+  for idx, each_data in enumerate(data):
+    each_data = np.squeeze(each_data)
+    if new_data == []:
+      new_data = each_data
+    else:
+      new_data = np.concatenate((new_data, each_data))
+    
+    each_label = label[idx]
+    each_label = [each_label]*len(each_data)
+    if new_label == []:
+      new_label = each_label
+    else:
+      new_label = np.concatenate((new_label, each_label))
+  return np.array(new_data), np.array(new_label)
+
 def one_hot(label):
   n_class = np.max(label) + 1
   new_label = np.zeros((len(label), n_class))
@@ -146,5 +166,17 @@ def one_hot_inverse(label):
     label_1D.append(np.argmax(i))
   return np.array(label_1D)
     
-    
+def plot_confusion(y_test, y_pred_inv, outdir, each_ML):
+   commands = ['Healthy', 'OR Damage', 'IR Damage']
+   confusion_mtx = tf.math.confusion_matrix(y_test, y_pred_inv)
+
+   plt.figure(figsize=(10, 8))
+   sns.heatmap(confusion_mtx,
+             xticklabels=commands,
+             yticklabels=commands,
+             annot=True, fmt='g')
+   plt.xlabel('Prediction')
+   plt.ylabel('Label')
+   plt.savefig(os.path.join(outdir, each_ML))
+   plt.show()
     

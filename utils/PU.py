@@ -1,6 +1,6 @@
 import numpy as np
 from os.path import join
-from utils.tools import load_PU_data
+from utils.tools import load_PU_data, load_table_10
 
 def load_PU_table(opt):
     if opt.PU_table_8:
