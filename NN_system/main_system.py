@@ -134,7 +134,8 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
 
         model.compile(loss=["categorical_crossentropy",
                     new_triplet_loss],
-                    optimizer=tf.keras.optimizers.experimental.RMSprop(), 
+                    optimizer=AngularGrad(),
+                    # tf.keras.optimizers.experimental.RMSprop(), 
                     metrics=["accuracy"], 
                     loss_weights=loss_weights)
 
