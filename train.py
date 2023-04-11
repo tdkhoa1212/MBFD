@@ -1,5 +1,6 @@
 import argparse
 from train_cases.PU_t8 import train_table_6, train_table_7
+from train_cases.PU_t10 import train_table_9
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -15,6 +16,7 @@ def parse_opt(known=False):
     parser.add_argument('--Ex_feature', type=str, default='fre', help='time, fre, time_fre')
     parser.add_argument('--PU_table_8', default=False, type=bool)
     parser.add_argument('--PU_table_10', default=True, type=bool)
+    parser.add_argument('--path_saved_data', type=str, default='./results', help='direction of data')
 
     # Parameters--------
     parser.add_argument('--alpha', default=0.4, type=int)
@@ -30,7 +32,7 @@ def parse_opt(known=False):
     parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
     
     # Mode-------
-    parser.add_argument('--table', type=str, default='table7', help='table6, table7')
+    parser.add_argument('--table', type=str, default='table_7', help='table_6, table_7, table_9')
     parser.add_argument('--model', type=str, default='main_model', help='main_model, SDLM, S_SDLM, U_SDLM')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -43,4 +45,6 @@ if __name__ == '__main__':
         train_table_6(opt)
     if opt.table == 'table7':
         train_table_7(opt)
+    if opt.table == 'table_9':
+        train_table_9(opt)
         

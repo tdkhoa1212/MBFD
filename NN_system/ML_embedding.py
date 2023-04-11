@@ -61,7 +61,7 @@ class FaceNetOneShotRecognitor(object):
 
         return X_train_embed, X_test_embed
       
-    def predict(self, test_embs, train_embs, ML_method=None, use_mean_var=False, get_acc=False):
+    def predict(self, test_embs, train_embs, ML_method=None, use_mean_var=False, get_pred=False):
         print('\n Test embs shape: ', test_embs.shape)
         print('Train embs shape: ', train_embs.shape)
         
@@ -106,12 +106,12 @@ class FaceNetOneShotRecognitor(object):
                             distances.append(cosine(test_embs[i].reshape(-1), train_embs[j]))
                 test_pred.append(self.y_train[np.argsort(distances)[0]])   
 
-            if get_acc:
+            if get_pred:
                 return test_pred
             else:
                 print(f"\nTEST ACCURACY: {accuracy_score(test_pred, self.y_test)}\n")   
         else:
-            if get_acc:
+            if get_pred:
                 test_pred = ML_models(self.X_train, self.y_train, self.X_test, self.y_test, ML_method, get_acc=get_acc)
                 return test_pred 
             else:
