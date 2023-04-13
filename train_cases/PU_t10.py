@@ -1,8 +1,6 @@
 from NN_system.ML_embedding import FaceNetOneShotRecognitor
-from utils.PU import Healthy, Outer_ring_damage, Inner_ring_damage 
-from utils.tools import invert_one_hot, load_table_10_spe,\
-                        recall_m, precision_m, f1_m, to_one_hot, \
-                        handcrafted_features, scaler_transform, \
+from utils.PU import load_PU_data_10
+from utils.tools import load_table_10_spe,\
                         plot_confusion, scaler_fit
 
 from itertools import combinations
@@ -37,128 +35,128 @@ def train_table_9(opt):
     case_0 = False 
     case_1 = True 
 
-    print('\t\t\t Loading labels...')
+    print('\nLoading labels...\n')
+    Healthy, Outer_ring_damage, Inner_ring_damage = load_PU_data_10(opt)
     Healthy_label           = np.array([0]*len(Healthy))
     Outer_ring_damage_label = np.array([1]*len(Outer_ring_damage))
     Inner_ring_damage_label = np.array([2]*len(Inner_ring_damage))
 
     ###################################### LOAD DATA ######################################
+    Healthy, Healthy_label = load_table_10_spe(Healthy, Healthy_label)
+    Outer_ring_damage, Outer_ring_damage_label = load_table_10_spe(Outer_ring_damage, Outer_ring_damage_label)
+    Inner_ring_damage, Inner_ring_damage_label = load_table_10_spe(Inner_ring_damage, Inner_ring_damage_label)
+    if os.path.exists(join(opt.path_saved_data, '/Healthy_10.npy')):
+        Healthy = np.load(join(opt.path_saved_data, '/Healthy_10.npy'), mmap_mode="r")  
+        Outer_ring_damage = np.load(join(opt.path_saved_data, '/Outer_ring_damage_10.npy'), mmap_mode="r")
+        Inner_ring_damage = np.load(join(opt.path_saved_data, '/Inner_ring_damage_10.npy'), mmap_mode="r")
+    else: 
+        with open(join(opt.path_saved_data, '/Healthy_10.npy'), 'wb') as f:
+            np.save(f, Healthy)
+        with open(join(opt.path_saved_data, '/Outer_ring_damage_10.npy'), 'wb') as f:
+            np.save(f, Outer_ring_damage)
+        with open(join(opt.path_saved_data, '/Inner_ring_damage_10.npy'), 'wb') as f:
+            np.save(f, Inner_ring_damage)
+
+    ###################################### PROCESS ######################################
+    np.random.seed(0)
+    Healthy, Healthy_label = shuffle(Healthy, Healthy_label, random_state=0)
+    Outer_ring_damage, Outer_ring_damage_label = shuffle(Outer_ring_damage, Outer_ring_damage_label, random_state=0)
+    Inner_ring_damage, Inner_ring_damage_label = shuffle(Inner_ring_damage, Inner_ring_damage_label, random_state=0)
+
+    print(color.GREEN + '\n\n\t *************START*************\n\n' + color.END)
+    emb_accuracy_SVM = []
+    emb_accuracy_RF = []
+    emb_accuracy_KNN = []
+    emb_accuracy_LGBM = []
+    emb_accuracy_euclidean = []
+    emb_accuracy_cosine = []
+
+    emb_accuracy_ensemble = []
+
+    #------------------------------------------Case 0: shuffle------------------------------------------------
     if case_0:
-        Healthy, Healthy_label = load_table_10_spe(Healthy, Healthy_label)
-        Outer_ring_damage, Outer_ring_damage_label = load_table_10_spe(Outer_ring_damage, Outer_ring_damage_label)
-        Inner_ring_damage, Inner_ring_damage_label = load_table_10_spe(Inner_ring_damage, Inner_ring_damage_label)
-        if os.path.exists(join(opt.path_saved_data, '/Healthy_10.npy')):
-            Healthy = np.load(join(opt.path_saved_data, '/Healthy_10.npy'), mmap_mode="r")  
-            Outer_ring_damage = np.load(join(opt.path_saved_data, '/Outer_ring_damage_10.npy'), mmap_mode="r")
-            Inner_ring_damage = np.load(join(opt.path_saved_data, '/Inner_ring_damage_10.npy'), mmap_mode="r")
-        else: 
-            with open(join(opt.path_saved_data, '/Healthy_10.npy'), 'wb') as f:
-                np.save(f, Healthy)
-            with open(join(opt.path_saved_data, '/Outer_ring_damage_10.npy'), 'wb') as f:
-                np.save(f, Outer_ring_damage)
-            with open(join(opt.path_saved_data, '/Inner_ring_damage_10.npy'), 'wb') as f:
-                np.save(f, Inner_ring_damage)
+        for i in range(5):
+            distance_Healthy = int(0.6*len(Healthy))
+            start_Healthy    = int(0.2*i*len(Healthy))
+            X_train_Healthy = Healthy[start_Healthy: start_Healthy+distance_Healthy]
+            if len(X_train_Healthy) < distance_Healthy:
+                break
+            y_train_Healthy = Healthy_label[start_Healthy: start_Healthy+distance_Healthy]
+            print(f'\n Shape of the Health train data and label: {X_train_Healthy.shape}, {y_train_Healthy.shape}')
+            
+            distance_Outer_ring_damage = int(0.6*len(Outer_ring_damage))
+            start_Outer_ring_damage    = int(0.2*i*len(Outer_ring_damage))
+            X_train_Outer_ring_damage, y_train_Outer_ring_damage = Outer_ring_damage[start_Outer_ring_damage: start_Outer_ring_damage+distance_Outer_ring_damage], Outer_ring_damage_label[start_Outer_ring_damage: start_Outer_ring_damage + distance_Outer_ring_damage]
+            print(f'\n Shape of the Outer ring damage train data and label: {X_train_Outer_ring_damage.shape}, {y_train_Outer_ring_damage.shape}')
+            
+            distance_Inner_ring_damage = int(0.6*len(Inner_ring_damage))
+            start_Inner_ring_damage    = int(0.2*i*len(Inner_ring_damage))
+            X_train_Inner_ring_damage, y_train_Inner_ring_damage = Inner_ring_damage[start_Inner_ring_damage: start_Inner_ring_damage + distance_Inner_ring_damage], Inner_ring_damage_label[start_Inner_ring_damage: start_Inner_ring_damage + distance_Inner_ring_damage]
+            print(f'\n Shape of the Inner ring damage train data and label: {X_train_Inner_ring_damage.shape}, {y_train_Inner_ring_damage.shape}')
+            
+            X_train = np.concatenate((X_train_Healthy, X_train_Outer_ring_damage, X_train_Inner_ring_damage))
+            y_train = np.concatenate((y_train_Healthy, y_train_Outer_ring_damage, y_train_Inner_ring_damage))
+            print(f'\n Shape of train data: {X_train.shape}, {y_train.shape}')
+            
+            print('\n'+ '-'*100)
 
-        ###################################### PROCESS ######################################
-        np.random.seed(0)
-        Healthy, Healthy_label = shuffle(Healthy, Healthy_label, random_state=0)
-        Outer_ring_damage, Outer_ring_damage_label = shuffle(Outer_ring_damage, Outer_ring_damage_label, random_state=0)
-        Inner_ring_damage, Inner_ring_damage_label = shuffle(Inner_ring_damage, Inner_ring_damage_label, random_state=0)
+            h = [a for a in range(len(Healthy)) if a not in range(start_Healthy, start_Healthy+distance_Healthy)]
+            
+            X_test_Healthy = Healthy[h]
+            y_test_Healthy = Healthy_label[h]
+            print(f'\n Shape of the Health test data and label: {X_test_Healthy.shape}, {y_test_Healthy.shape}')
+            
+            k = [a for a in range(len(Outer_ring_damage)) if a not in range(start_Outer_ring_damage, start_Outer_ring_damage+distance_Outer_ring_damage)]
+            X_test_Outer_ring_damage = Outer_ring_damage[k]
+            y_test_Outer_ring_damage = Outer_ring_damage_label[k]
+            print(f'\n Shape of the Outer ring damage test data and label: {X_test_Outer_ring_damage.shape}, {y_test_Outer_ring_damage.shape}')
+            
+            l = [a for a in range(len(Inner_ring_damage)) if a not in range(start_Inner_ring_damage, start_Inner_ring_damage+distance_Inner_ring_damage)]
+            X_test_Inner_ring_damage = Inner_ring_damage[l]
+            y_test_Inner_ring_damage = Inner_ring_damage_label[l]
+            print(f'\n Shape of the Inner ring damage test data and label: {X_test_Inner_ring_damage.shape}, {y_test_Inner_ring_damage.shape}')
+            
+            X_test = np.concatenate((X_test_Healthy, X_test_Outer_ring_damage, X_test_Inner_ring_damage))
+            y_test = np.concatenate((y_test_Healthy, y_test_Outer_ring_damage, y_test_Inner_ring_damage))
+            print(f'\n Shape of test data: {X_test.shape}, {y_test.shape}')
+            print('\n'+ '-'*100)
 
-        print(color.GREEN + '\n\n\t *************START*************\n\n' + color.END)
-        emb_accuracy_SVM = []
-        emb_accuracy_RF = []
-        emb_accuracy_KNN = []
-        emb_accuracy_LGBM = []
-        emb_accuracy_euclidean = []
-        emb_accuracy_cosine = []
+            print("\n" + "#"*20 + ' TRAINING PHASE ' + "#"*20 + "\n")
+            model, scale_1, scale_2 = train_main_system(X_train, y_train, X_test, y_test, opt)
+            emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
+            X_train_embed, X_test_embed = emb_sys.get_emb()
 
-        emb_accuracy_ensemble = []
+            y_pred_all = []
+            l = 0
+            for each_ML in ['SVM', 'RF', 'KNN', 'LGBM', 'euclidean', 'cosine']:
+                l += 1
+                y_pred = emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False, get_pred=True)
+                y_pred_all.append(y_pred)
+                acc = accuracy_score(y_pred, y_test)
+                if each_ML == 'SVM':
+                    emb_accuracy_SVM.append(acc)
+                elif each_ML == 'RF':
+                    emb_accuracy_RF.append(acc)
+                elif each_ML == 'KNN':
+                    emb_accuracy_KNN.append(acc)
+                elif each_ML == 'LGBM':
+                    emb_accuracy_LGBM.append(acc)
+                elif each_ML == 'euclidean':
+                    emb_accuracy_euclidean.append(acc)
+                elif each_ML == 'cosine':
+                    emb_accuracy_cosine.append(acc)
 
-        #------------------------------------------Case 0: shuffle------------------------------------------------
-        if case_0:
-            for i in range(5):
-                distance_Healthy = int(0.6*len(Healthy))
-                start_Healthy    = int(0.2*i*len(Healthy))
-                X_train_Healthy = Healthy[start_Healthy: start_Healthy+distance_Healthy]
-                if len(X_train_Healthy) < distance_Healthy:
-                    break
-                y_train_Healthy = Healthy_label[start_Healthy: start_Healthy+distance_Healthy]
-                print(f'\n Shape of the Health train data and label: {X_train_Healthy.shape}, {y_train_Healthy.shape}')
-                
-                distance_Outer_ring_damage = int(0.6*len(Outer_ring_damage))
-                start_Outer_ring_damage    = int(0.2*i*len(Outer_ring_damage))
-                X_train_Outer_ring_damage, y_train_Outer_ring_damage = Outer_ring_damage[start_Outer_ring_damage: start_Outer_ring_damage+distance_Outer_ring_damage], Outer_ring_damage_label[start_Outer_ring_damage: start_Outer_ring_damage + distance_Outer_ring_damage]
-                print(f'\n Shape of the Outer ring damage train data and label: {X_train_Outer_ring_damage.shape}, {y_train_Outer_ring_damage.shape}')
-                
-                distance_Inner_ring_damage = int(0.6*len(Inner_ring_damage))
-                start_Inner_ring_damage    = int(0.2*i*len(Inner_ring_damage))
-                X_train_Inner_ring_damage, y_train_Inner_ring_damage = Inner_ring_damage[start_Inner_ring_damage: start_Inner_ring_damage + distance_Inner_ring_damage], Inner_ring_damage_label[start_Inner_ring_damage: start_Inner_ring_damage + distance_Inner_ring_damage]
-                print(f'\n Shape of the Inner ring damage train data and label: {X_train_Inner_ring_damage.shape}, {y_train_Inner_ring_damage.shape}')
-                
-                X_train = np.concatenate((X_train_Healthy, X_train_Outer_ring_damage, X_train_Inner_ring_damage))
-                y_train = np.concatenate((y_train_Healthy, y_train_Outer_ring_damage, y_train_Inner_ring_damage))
-                print(f'\n Shape of train data: {X_train.shape}, {y_train.shape}')
-                
-                print('\n'+ '-'*100)
+                print(f'\n--------------Test accuracy: {acc} with the {each_ML} method--------------')
 
-                h = [a for a in range(len(Healthy)) if a not in range(start_Healthy, start_Healthy+distance_Healthy)]
-                
-                X_test_Healthy = Healthy[h]
-                y_test_Healthy = Healthy_label[h]
-                print(f'\n Shape of the Health test data and label: {X_test_Healthy.shape}, {y_test_Healthy.shape}')
-                
-                k = [a for a in range(len(Outer_ring_damage)) if a not in range(start_Outer_ring_damage, start_Outer_ring_damage+distance_Outer_ring_damage)]
-                X_test_Outer_ring_damage = Outer_ring_damage[k]
-                y_test_Outer_ring_damage = Outer_ring_damage_label[k]
-                print(f'\n Shape of the Outer ring damage test data and label: {X_test_Outer_ring_damage.shape}, {y_test_Outer_ring_damage.shape}')
-                
-                l = [a for a in range(len(Inner_ring_damage)) if a not in range(start_Inner_ring_damage, start_Inner_ring_damage+distance_Inner_ring_damage)]
-                X_test_Inner_ring_damage = Inner_ring_damage[l]
-                y_test_Inner_ring_damage = Inner_ring_damage_label[l]
-                print(f'\n Shape of the Inner ring damage test data and label: {X_test_Inner_ring_damage.shape}, {y_test_Inner_ring_damage.shape}')
-                
-                X_test = np.concatenate((X_test_Healthy, X_test_Outer_ring_damage, X_test_Inner_ring_damage))
-                y_test = np.concatenate((y_test_Healthy, y_test_Outer_ring_damage, y_test_Inner_ring_damage))
-                print(f'\n Shape of test data: {X_test.shape}, {y_test.shape}')
-                print('\n'+ '-'*100)
+            y_pred_all = y_pred_all.astype(np.float32) / l
+            y_pred_all = np.argmax(y_pred_all, axis=1)
+            acc_all = accuracy_score(y_test, y_pred_all)
+            emb_accuracy_ensemble.append(acc_all)
 
-                print("\n" + "#"*20 + ' TRAINING PHASE ' + "#"*20 + "\n")
-                model, scale_1, scale_2 = train_main_system(X_train, y_train, X_test, y_test, opt)
-                emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
-                X_train_embed, X_test_embed = emb_sys.get_emb()
+            print(f'\n --------------Ensemble: {acc_all}--------------')
+            print(color.GREEN + f'\n\t\t********* FINISHING ROUND {i} *********\n\n\n' + color.END)
 
-                y_pred_all = []
-                l = 0
-                for each_ML in ['SVM', 'RF', 'KNN', 'LGBM', 'euclidean', 'cosine']:
-                    l += 1
-                    y_pred = emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False, get_pred=True)
-                    y_pred_all.append(y_pred)
-                    acc = accuracy_score(y_pred, y_test)
-                    if each_ML == 'SVM':
-                        emb_accuracy_SVM.append(acc)
-                    elif each_ML == 'RF':
-                        emb_accuracy_RF.append(acc)
-                    elif each_ML == 'KNN':
-                        emb_accuracy_KNN.append(acc)
-                    elif each_ML == 'LGBM':
-                        emb_accuracy_LGBM.append(acc)
-                    elif each_ML == 'euclidean':
-                        emb_accuracy_euclidean.append(acc)
-                    elif each_ML == 'cosine':
-                        emb_accuracy_cosine.append(acc)
-
-                    print(f'\n--------------Test accuracy: {acc} with the {each_ML} method--------------')
-
-                y_pred_all = y_pred_all.astype(np.float32) / l
-                y_pred_all = np.argmax(y_pred_all, axis=1)
-                acc_all = accuracy_score(y_test, y_pred_all)
-                emb_accuracy_ensemble.append(acc_all)
-
-                print(f'\n --------------Ensemble: {acc_all}--------------')
-                print(color.GREEN + f'\n\t\t********* FINISHING ROUND {i} *********\n\n\n' + color.END)
-
-                print(color.GREEN + f'\n\t\t********* FINISHING ROUND {idx} *********\n\n\n' + color.END)
+            print(color.GREEN + f'\n\t\t********* FINISHING ROUND {idx} *********\n\n\n' + color.END)
 
     #------------------------------------------Case 1: similar to the original paper------------------------------------------------
     if case_1:

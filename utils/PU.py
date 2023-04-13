@@ -59,30 +59,31 @@ def load_PU_table(opt):
         y_test = np.concatenate((Healthy_test_label, OR_Damage_test_label, IR_Damage_test_label))
         return X_train, y_train, X_test, y_test
 
-        
+def load_PU_data_10(opt):
     if opt.PU_table_10:
-        print('\t\t\t Loading Healthy class...\t\t\t\n')
-        K001 = load_table_10(opt.data_dir + 'K001')
-        K002 = load_table_10(opt.data_dir + 'K002')
-        K003 = load_table_10(opt.data_dir + 'K003')
-        K004 = load_table_10(opt.data_dir + 'K004')
-        K005 = load_table_10(opt.data_dir + 'K005')
+        print('Loading Healthy data...')
+        K001 = load_PU_data(join(opt.data_dir, 'K001'))
+        K002 = load_PU_data(join(opt.data_dir, 'K002'))
+        K003 = load_PU_data(join(opt.data_dir, 'K003'))
+        K004 = load_PU_data(join(opt.data_dir, 'K004'))
+        K005 = load_PU_data(join(opt.data_dir, 'K005'))
         
-        print('\t\t\t Loading Outer ring damage...\t\t\t\n')
-        KA04 = load_table_10(opt.data_dir + 'KA04')
-        KA15 = load_table_10(opt.data_dir + 'KA15')
-        KA16 = load_table_10(opt.data_dir + 'KA16')
-        KA22 = load_table_10(opt.data_dir + 'KA22')
-        KA30 = load_table_10(opt.data_dir + 'KA30')
+        print('Loading Outer ring damage...')
+        KA04 = load_PU_data(join(opt.data_dir, 'KA04'))
+        KA15 = load_PU_data(join(opt.data_dir, 'KA15'))
+        KA16 = load_PU_data(join(opt.data_dir, 'KA16'))
+        KA22 = load_PU_data(join(opt.data_dir, 'KA22'))
+        KA30 = load_PU_data(join(opt.data_dir, 'KA30'))
         
-        print('\t\t\t Loading Inner ring damage...\t\t\t\n')
-        KI04 = load_table_10(opt.data_dir + 'KI04')
-        KI14 = load_table_10(opt.data_dir + 'KI14')
-        KI16 = load_table_10(opt.data_dir + 'KI16')
-        KI18 = load_table_10(opt.data_dir + 'KI18')
-        KI21 = load_table_10(opt.data_dir + 'KI21')
+        print('Loading Inner ring damage...')
+        KI04 = load_PU_data(join(opt.data_dir, 'KI04'))
+        KI14 = load_PU_data(join(opt.data_dir, 'KI14'))
+        KI16 = load_PU_data(join(opt.data_dir, 'KI16'))
+        KI18 = load_PU_data(join(opt.data_dir, 'KI18'))
+        KI21 = load_PU_data(join(opt.data_dir, 'KI21'))
         
-        print('\t\t\t Loading all data...\t\t\t\n')
+        print('Loading all data...')
         Healthy = np.concatenate((K001, K002, K003, K004, K005))
         Outer_ring_damage = np.concatenate((KA04, KA15, KA16, KA22, KA30))
         Inner_ring_damage = np.concatenate((KI04, KI14, KI16, KI18, KI21))
+        return Healthy, Outer_ring_damage, Inner_ring_damage

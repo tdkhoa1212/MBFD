@@ -9,14 +9,14 @@ def parse_opt(known=False):
     parser.add_argument('--ML_method', default=['RF', 'KNN', 'LGBM', 'euclidean', 'cosine', 'SVM']  , type=list, help='SVM, RF, KNN, LGBM, euclidean, cosine')
     parser.add_argument('--scaler', default="PowerTransformer", type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
     parser.add_argument('--type_data', type=str, default='vibration', help='vibration, MCS1, MCS2')
-    parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data', help='direction of data')
+    parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data/PU_data/', help='direction of data')
     parser.add_argument('--weights_path', type=str, default='/content/drive/MyDrive/Khoa/results', help='direction of data')
     parser.add_argument('--img_outdir', type=str, default='/content/drive/MyDrive/Khoa/results/images', help='direction of data')
     parser.add_argument('--load_weights', default=True, type=bool)
     parser.add_argument('--Ex_feature', type=str, default='fre', help='time, fre, time_fre')
     parser.add_argument('--PU_table_8', default=False, type=bool)
     parser.add_argument('--PU_table_10', default=True, type=bool)
-    parser.add_argument('--path_saved_data', type=str, default='/content/drive/MyDrive/Khoa/results', help='direction of data')
+    parser.add_argument('--path_saved_data', type=str, default='/content/drive/MyDrive/Khoa/results/saved_data', help='direction of data')
 
     # Parameters--------
     parser.add_argument('--alpha', default=0.4, type=int)
@@ -32,7 +32,7 @@ def parse_opt(known=False):
     parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
     
     # Mode-------
-    parser.add_argument('--table', type=str, default='table_7', help='table_6, table_7, table_9')
+    parser.add_argument('--table', type=str, default='table_9', help='table_6, table_7, table_9')
     parser.add_argument('--model', type=str, default='main_model', help='main_model, SDLM, S_SDLM, U_SDLM')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
