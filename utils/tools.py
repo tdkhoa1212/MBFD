@@ -74,7 +74,7 @@ def scaler_fit(train_signals, opt):
     train_data = scale.transform(train_signals)
     return train_data, scale
 
-def ML_models(X_train, y_train, X_test, y_test, ML_method, get_acc=False):
+def ML_models(X_train, y_train, X_test, y_test, ML_method, get_pred=False):
     '''
     X_train, X_test: matrices
     y_train, y_test: matrices (onehot)
@@ -90,7 +90,7 @@ def ML_models(X_train, y_train, X_test, y_test, ML_method, get_acc=False):
     
     model.fit(X_train, y_train)
     y_test_pred = model.predict(X_test)
-    if get_acc:
+    if get_pred:
       return y_test_pred
     print(f"\nTEST ACCURACY: {accuracy_score(y_test, y_test_pred)}\n")
 
