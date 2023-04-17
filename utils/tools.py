@@ -93,7 +93,7 @@ def ML_models(X_train, y_train, X_test, y_test, ML_method, get_acc=False):
       return y_test_pred
     print(f"\nTEST ACCURACY: {accuracy_score(y_test, y_test_pred)}\n")
 
-def load_PU_data(path, opt):
+def load_PU_data(path, opt, pre_min_l=None):
   data = []
   all_data = []
   min_l = 0
@@ -117,7 +117,9 @@ def load_PU_data(path, opt):
       elif min_l > signal.shape[0]:
         min_l = int(signal.shape[0])   
       all_data.append(signal)
-      
+  
+  if pre_min_l != None:
+    min_l = pre_min_l
   for i in all_data:
     each_data = i[:min_l].tolist()
     data.append(each_data)
