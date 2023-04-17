@@ -4,6 +4,7 @@ import seaborn as sns
 from sklearn.manifold import TSNE
 import os
 import scipy.io
+import tensorflow as tf
 from os.path import join
 from sklearn.metrics import accuracy_score
 
