@@ -62,28 +62,28 @@ def load_PU_table(opt):
 def load_PU_data_10(opt):
     if opt.PU_table_10:
         print('Loading Healthy data...')
-        K001 = np.expand_dims(load_PU_data(join(opt.data_dir, 'K001'), opt, 255990), axis=0)
-        K002 = np.expand_dims(load_PU_data(join(opt.data_dir, 'K002'), opt, 255990), axis=0)
-        K003 = np.expand_dims(load_PU_data(join(opt.data_dir, 'K003'), opt, 255990), axis=0)
-        K004 = np.expand_dims(load_PU_data(join(opt.data_dir, 'K004'), opt, 255990), axis=0)
-        K005 = np.expand_dims(load_PU_data(join(opt.data_dir, 'K005'), opt, 255990), axis=0)
+        K001 = load_PU_data(join(opt.data_dir, 'K001'), opt, 255990)
+        K002 = load_PU_data(join(opt.data_dir, 'K002'), opt, 255990)
+        K003 = load_PU_data(join(opt.data_dir, 'K003'), opt, 255990)
+        K004 = load_PU_data(join(opt.data_dir, 'K004'), opt, 255990)
+        K005 = load_PU_data(join(opt.data_dir, 'K005'), opt, 255990)
         
         print('Loading Outer ring damage...')
-        KA04 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KA04'), opt, 255990), axis=0)
-        KA15 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KA15'), opt, 255990), axis=0)
-        KA16 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KA16'), opt, 255990), axis=0)
-        KA22 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KA22'), opt, 255990), axis=0)
-        KA30 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KA30'), opt, 255990), axis=0)
+        KA04 = load_PU_data(join(opt.data_dir, 'KA04'), opt, 255990)
+        KA15 = load_PU_data(join(opt.data_dir, 'KA15'), opt, 255990)
+        KA16 = load_PU_data(join(opt.data_dir, 'KA16'), opt, 255990)
+        KA22 = load_PU_data(join(opt.data_dir, 'KA22'), opt, 255990)
+        KA30 = load_PU_data(join(opt.data_dir, 'KA30'), opt, 255990)
         
         print('Loading Inner ring damage...')
-        KI04 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KI04'), opt, 255990), axis=0)
-        KI14 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KI14'), opt, 255990), axis=0)
-        KI16 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KI16'), opt, 255990), axis=0)
-        KI18 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KI18'), opt, 255990), axis=0)
-        KI21 = np.expand_dims(load_PU_data(join(opt.data_dir, 'KI21'), opt, 255990), axis=0)
+        KI04 = load_PU_data(join(opt.data_dir, 'KI04'), opt, 255990)
+        KI14 = load_PU_data(join(opt.data_dir, 'KI14'), opt, 255990)
+        KI16 = load_PU_data(join(opt.data_dir, 'KI16'), opt, 255990)
+        KI18 = load_PU_data(join(opt.data_dir, 'KI18'), opt, 255990)
+        KI21 = load_PU_data(join(opt.data_dir, 'KI21'), opt, 255990)
         
         print('Loading all data...')
-        Healthy = np.concatenate((K001, K002, K003, K004, K005))
-        Outer_ring_damage = np.concatenate((KA04, KA15, KA16, KA22, KA30))
-        Inner_ring_damage = np.concatenate((KI04, KI14, KI16, KI18, KI21))
+        Healthy = [K001, K002, K003, K004, K005]
+        Outer_ring_damage = [KA04, KA15, KA16, KA22, KA30]
+        Inner_ring_damage = [KI04, KI14, KI16, KI18, KI21]
         return Healthy, Outer_ring_damage, Inner_ring_damage

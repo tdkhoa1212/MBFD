@@ -23,7 +23,7 @@ def parse_opt(known=False):
     parser.add_argument('--lambda_', default=0.3, type=int)
     parser.add_argument('--embedding_size', default=256, type=int)
     parser.add_argument('--e_input_shape', default=6270, type=int, help='11, 6270, 6281') 
-    parser.add_argument('--input_shape', default=250604, type=int)  
+    parser.add_argument('--input_shape', default=255990, type=int)  
     parser.add_argument('--num_classes', default=3, type=int) 
     parser.add_argument('--batch_size', default=16, type=int) 
     parser.add_argument('--epochs', default=30, type=int) 

@@ -76,12 +76,13 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         n_data_e = X_train_e[:, 2]
 
         if opt.scaler != None:
-            if exists(f'./results/{opt.scaler}_scale_1.pkl'):
-                scale_1 = load(open(f'./results/{opt.scaler}_scale_1.pkl', 'rb'))
+            scaler_path = join(opt.path_saved_data, f'/{opt.scaler}_scale_1.pkl')
+            if exists(scaler_path):
+                scale_1 = load(open(scaler_path, 'rb'))
             else:
                 a_data_e, p_data_e, n_data_e, scale_1 = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
                 X_test = scale_test(X_test, scale_1)
-                dump(scale_1, open(f'./results/{opt.scaler}_scale_1.pkl', 'wb'))
+                dump(scale_1, open(scaler_path, 'wb'))
 
         # Data of extract branch
         if opt.Ex_feature == 'time':
