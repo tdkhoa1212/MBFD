@@ -233,14 +233,15 @@ def train_table_9(opt):
 
             print("\n" + "#"*20 + ' TRAINING PHASE ' + "#"*20 + "\n")
             model, scale_1, scale_2 = train_main_system(X_train, y_train, X_test, y_test, opt)
-            emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
-            X_train_embed, X_test_embed = emb_sys.get_emb()
 
             y_pred_all = []
             l = 0
             for each_ML in ['SVM', 'RF', 'KNN', 'LGBM', 'euclidean', 'cosine']:
                 l += 1
+                emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
+                X_train_embed, X_test_embed = emb_sys.get_emb()
                 y_pred = emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False, get_pred=True)
+                
                 y_pred_all.append(y_pred)
                 acc = accuracy_score(y_pred, y_test)
                 if each_ML == 'SVM':
