@@ -170,12 +170,12 @@ def train_table_9(opt):
             i = list(i)
             tf.keras.backend.clear_session()
             # gc.collect()
-            if os.path.exists(join(opt.path_saved_data, f'/X_train_table10_{i}.npy')):
-                X_train = np.load(join(opt.path_saved_data, f'/X_train_table10_{i}.npy'), mmap_mode="r")
-                y_train = np.load(join(opt.path_saved_data, f'/y_train_table10_{i}.npy'), mmap_mode="r")
+            if os.path.exists(join(opt.path_saved_data, f'X_train_table10_{i}.npy')):
+                X_train = np.load(join(opt.path_saved_data, f'X_train_table10_{i}.npy'), mmap_mode="r")
+                y_train = np.load(join(opt.path_saved_data, f'y_train_table10_{i}.npy'), mmap_mode="r")
             
-                X_test = np.load(join(opt.path_saved_data, f'/X_test_table10_{i}.npy'), mmap_mode="r")
-                y_test = np.load(join(opt.path_saved_data, f'/y_test_scaled_table10_{i}.npy'), mmap_mode="r")
+                X_test = np.load(join(opt.path_saved_data, f'X_test_table10_{i}.npy'), mmap_mode="r")
+                y_test = np.load(join(opt.path_saved_data, f'y_test_scaled_table10_{i}.npy'), mmap_mode="r")
             else:
                 X_train_Healthy, y_train_Healthy = get_list(Healthy, i), get_list(Healthy_label, i) 
                 X_train_Healthy, y_train_Healthy = load_table_10_spe(X_train_Healthy, y_train_Healthy)
@@ -192,10 +192,10 @@ def train_table_9(opt):
                 X_train = np.concatenate((X_train_Healthy, X_train_Outer_ring_damage, X_train_Inner_ring_damage))
                 y_train = np.concatenate((y_train_Healthy, y_train_Outer_ring_damage, y_train_Inner_ring_damage))
 
-                with open(join(opt.path_saved_data,  f'/X_train_table10_{i}.npy'), 'wb') as f:
+                with open(join(opt.path_saved_data,  f'X_train_table10_{i}.npy'), 'wb') as f:
                     np.save(f, X_train)
 
-                with open(join(opt.path_saved_data, f'/y_train_table10_{i}.npy'), 'wb') as f:
+                with open(join(opt.path_saved_data, f'y_train_table10_{i}.npy'), 'wb') as f:
                     np.save(f, y_train)
                 
             print('\n'+ '-'*100 + '\n')
@@ -221,9 +221,9 @@ def train_table_9(opt):
             X_test = np.concatenate((X_test_Healthy, X_test_Outer_ring_damage, X_test_Inner_ring_damage))
             y_test = np.concatenate((y_test_Healthy, y_test_Outer_ring_damage, y_test_Inner_ring_damage))
             
-            with open(join(opt.path_saved_data, f'/X_test_table10_{i}.npy'), 'wb') as f:
+            with open(join(opt.path_saved_data, f'X_test_table10_{i}.npy'), 'wb') as f:
                 np.save(f, X_test)
-            with open(join(opt.path_saved_data, f'/y_test_scaled_table10_{i}.npy'), 'wb') as f:
+            with open(join(opt.path_saved_data, f'y_test_scaled_table10_{i}.npy'), 'wb') as f:
                 np.save(f, y_test)
 
             print('\n'+ '-'*100)
