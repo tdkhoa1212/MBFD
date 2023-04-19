@@ -9,7 +9,7 @@ from NN_system.main_system import train_main_system
 import tensorflow as tf
 import numpy as np
 import os
-from os.path import join
+from os.path import join, exists
 from sklearn.metrics import accuracy_score
 import warnings
 from NN_system.main_system import train_main_system
@@ -38,12 +38,32 @@ def train_table_9(opt):
     case_0 = False 
     case_1 = True 
 
-    print('\nLoading labels...\n')
-    Healthy, Outer_ring_damage, Inner_ring_damage = load_PU_data_10(opt)
-    Healthy_label           = np.array([0]*len(Healthy))
-    Outer_ring_damage_label = np.array([1]*len(Outer_ring_damage))
-    Inner_ring_damage_label = np.array([2]*len(Inner_ring_damage))
+    if exists(join(opt.path_saved_data, 'Healthy.npy')):
+      Healthy = np.load(join(opt.path_saved_data, 'Healthy_10.npy'), mmap_mode="r") 
+      Outer_ring_damage = np.load(join(opt.path_saved_data, 'Outer_ring_damage.npy'), mmap_mode="r") 
+      Inner_ring_damage = np.load(join(opt.path_saved_data, 'Inner_ring_damage.npy'), mmap_mode="r") 
+      Healthy_label = np.load(join(opt.path_saved_data, 'Healthy_label.npy'), mmap_mode="r") 
+      Outer_ring_damage_label = np.load(join(opt.path_saved_data, 'Outer_ring_damage_label.npy'), mmap_mode="r") 
+      Inner_ring_damage_label = np.load(join(opt.path_saved_data, 'Inner_ring_damage_label.npy'), mmap_mode="r") 
+    else:
+      Healthy, Outer_ring_damage, Inner_ring_damage = load_PU_data_10(opt)
+      Healthy_label           = np.array([0]*len(Healthy))
+      Outer_ring_damage_label = np.array([1]*len(Outer_ring_damage))
+      Inner_ring_damage_label = np.array([2]*len(Inner_ring_damage))
 
+      with open(join(opt.path_saved_data, 'Healthy.npy'), 'wb') as f:
+          np.save(f, Healthy)
+      with open(join(opt.path_saved_data, 'Outer_ring_damage.npy'), 'wb') as f:
+          np.save(f, Outer_ring_damage)
+      with open(join(opt.path_saved_data, 'Inner_ring_damage.npy'), 'wb') as f:
+          np.save(f, Inner_ring_damage)
+      with open(join(opt.path_saved_data, 'Healthy_label.npy'), 'wb') as f:
+          np.save(f, Healthy_label)
+      with open(join(opt.path_saved_data, 'Outer_ring_damage_label.npy'), 'wb') as f:
+          np.save(f, Outer_ring_damage_label)
+      with open(join(opt.path_saved_data, 'Inner_ring_damage_label.npy'), 'wb') as f:
+          np.save(f, Inner_ring_damage_label)
+        
     # ###################################### LOAD DATA ######################################
     # Healthy, Healthy_label = load_table_10_spe(Healthy, Healthy_label)
     # Outer_ring_damage, Outer_ring_damage_label = load_table_10_spe(Outer_ring_damage, Outer_ring_damage_label)
@@ -53,12 +73,7 @@ def train_table_9(opt):
     #     Outer_ring_damage = np.load(join(opt.path_saved_data, '/Outer_ring_damage_10.npy'), mmap_mode="r")
     #     Inner_ring_damage = np.load(join(opt.path_saved_data, '/Inner_ring_damage_10.npy'), mmap_mode="r")
     # else: 
-    #     with open(join(opt.path_saved_data, '/Healthy_10.npy'), 'wb') as f:
-    #         np.save(f, Healthy)
-    #     with open(join(opt.path_saved_data, '/Outer_ring_damage_10.npy'), 'wb') as f:
-    #         np.save(f, Outer_ring_damage)
-    #     with open(join(opt.path_saved_data, '/Inner_ring_damage_10.npy'), 'wb') as f:
-    #         np.save(f, Inner_ring_damage)
+        
 
     # ###################################### PROCESS ######################################
     # np.random.seed(0)
