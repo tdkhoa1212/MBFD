@@ -39,7 +39,7 @@ def train_table_9(opt):
     case_1 = True 
 
     if exists(join(opt.path_saved_data, 'Healthy.npy')):
-      Healthy = np.load(join(opt.path_saved_data, 'Healthy_10.npy'), mmap_mode="r") 
+      Healthy = np.load(join(opt.path_saved_data, 'Healthy.npy'), mmap_mode="r") 
       Outer_ring_damage = np.load(join(opt.path_saved_data, 'Outer_ring_damage.npy'), mmap_mode="r") 
       Inner_ring_damage = np.load(join(opt.path_saved_data, 'Inner_ring_damage.npy'), mmap_mode="r") 
       Healthy_label = np.load(join(opt.path_saved_data, 'Healthy_label.npy'), mmap_mode="r") 
@@ -63,24 +63,7 @@ def train_table_9(opt):
           np.save(f, Outer_ring_damage_label)
       with open(join(opt.path_saved_data, 'Inner_ring_damage_label.npy'), 'wb') as f:
           np.save(f, Inner_ring_damage_label)
-        
-    # ###################################### LOAD DATA ######################################
-    # Healthy, Healthy_label = load_table_10_spe(Healthy, Healthy_label)
-    # Outer_ring_damage, Outer_ring_damage_label = load_table_10_spe(Outer_ring_damage, Outer_ring_damage_label)
-    # Inner_ring_damage, Inner_ring_damage_label = load_table_10_spe(Inner_ring_damage, Inner_ring_damage_label)
-    # if os.path.exists(join(opt.path_saved_data, '/Healthy_10.npy')):
-    #     Healthy = np.load(join(opt.path_saved_data, '/Healthy_10.npy'), mmap_mode="r")  
-    #     Outer_ring_damage = np.load(join(opt.path_saved_data, '/Outer_ring_damage_10.npy'), mmap_mode="r")
-    #     Inner_ring_damage = np.load(join(opt.path_saved_data, '/Inner_ring_damage_10.npy'), mmap_mode="r")
-    # else: 
-        
-
-    # ###################################### PROCESS ######################################
-    # np.random.seed(0)
-    # Healthy, Healthy_label = shuffle(Healthy, Healthy_label, random_state=0)
-    # Outer_ring_damage, Outer_ring_damage_label = shuffle(Outer_ring_damage, Outer_ring_damage_label, random_state=0)
-    # Inner_ring_damage, Inner_ring_damage_label = shuffle(Inner_ring_damage, Inner_ring_damage_label, random_state=0)
-
+      
     print(color.GREEN + '\n\n\t *************START*************\n\n' + color.END)
     emb_accuracy_SVM = []
     emb_accuracy_RF = []
