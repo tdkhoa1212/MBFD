@@ -39,12 +39,12 @@ def train_table_9(opt):
     case_1 = True 
 
     if exists(join(opt.path_saved_data, 'Healthy.npy')):
-      Healthy = np.load(join(opt.path_saved_data, 'Healthy.npy'), mmap_mode="r") 
-      Outer_ring_damage = np.load(join(opt.path_saved_data, 'Outer_ring_damage.npy'), mmap_mode="r") 
-      Inner_ring_damage = np.load(join(opt.path_saved_data, 'Inner_ring_damage.npy'), mmap_mode="r") 
-      Healthy_label = np.load(join(opt.path_saved_data, 'Healthy_label.npy'), mmap_mode="r") 
-      Outer_ring_damage_label = np.load(join(opt.path_saved_data, 'Outer_ring_damage_label.npy'), mmap_mode="r") 
-      Inner_ring_damage_label = np.load(join(opt.path_saved_data, 'Inner_ring_damage_label.npy'), mmap_mode="r") 
+      Healthy = np.load(join(opt.path_saved_data, 'Healthy.npy'), allow_pickle=True) 
+      Outer_ring_damage = np.load(join(opt.path_saved_data, 'Outer_ring_damage.npy'), allow_pickle=True) 
+      Inner_ring_damage = np.load(join(opt.path_saved_data, 'Inner_ring_damage.npy'), allow_pickle=True) 
+      Healthy_label = np.load(join(opt.path_saved_data, 'Healthy_label.npy'), allow_pickle=True) 
+      Outer_ring_damage_label = np.load(join(opt.path_saved_data, 'Outer_ring_damage_label.npy'), allow_pickle=True) 
+      Inner_ring_damage_label = np.load(join(opt.path_saved_data, 'Inner_ring_damage_label.npy'), allow_pickle=True) 
     else:
       Healthy, Outer_ring_damage, Inner_ring_damage = load_PU_data_10(opt)
       Healthy_label           = np.array([0]*len(Healthy))
@@ -167,13 +167,13 @@ def train_table_9(opt):
         for idx, i in enumerate(comb):
             i = list(i)
             tf.keras.backend.clear_session()
-            # gc.collect()
+            # , mmap_mode="r"
             if os.path.exists(join(opt.path_saved_data, f'X_train_table10_{i}.npy')):
-                X_train = np.load(join(opt.path_saved_data, f'X_train_table10_{i}.npy'), mmap_mode="r")
-                y_train = np.load(join(opt.path_saved_data, f'y_train_table10_{i}.npy'), mmap_mode="r")
+                X_train = np.load(join(opt.path_saved_data, f'X_train_table10_{i}.npy'), allow_pickle=True)
+                y_train = np.load(join(opt.path_saved_data, f'y_train_table10_{i}.npy'), allow_pickle=True)
             
-                X_test = np.load(join(opt.path_saved_data, f'X_test_table10_{i}.npy'), mmap_mode="r")
-                y_test = np.load(join(opt.path_saved_data, f'y_test_scaled_table10_{i}.npy'), mmap_mode="r")
+                X_test = np.load(join(opt.path_saved_data, f'X_test_table10_{i}.npy'), allow_pickle=True)
+                y_test = np.load(join(opt.path_saved_data, f'y_test_scaled_table10_{i}.npy'), allow_pickle=True)
             else:
                 X_train_Healthy, y_train_Healthy = get_list(Healthy, i), get_list(Healthy_label, i) 
                 X_train_Healthy, y_train_Healthy = load_table_10_spe(X_train_Healthy, y_train_Healthy)

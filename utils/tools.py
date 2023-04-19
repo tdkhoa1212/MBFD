@@ -97,7 +97,9 @@ def ML_models(X_train, y_train, X_test, y_test, ML_method, get_pred=False):
     if ML_method == 'KNN':     
       model = KNeighborsClassifier()
     if ML_method == 'LGBM':
-      model = LGBMClassifier(num_iteration = 10)
+      model = LGBMClassifier(model = LGBMClassifier(max_depth=-1, learning_rate=0.1, objective='multiclass',
+                             random_state=314, silent=True, metric='None', 
+                             n_jobs=4, n_estimators=5000, class_weight='balanced'))
     
     model.fit(X_train, y_train)
     print("test model-----------------------")
