@@ -86,7 +86,7 @@ def ML_models(X_train, y_train, X_test, y_test, ML_method, get_pred=False):
     if ML_method == 'KNN':     
       model = KNeighborsClassifier()
     if ML_method == 'LGBM':
-      model = LGBMClassifier()
+      model = LGBMClassifier(early_stopping_round <= 0)
     
     model.fit(X_train, y_train)
     y_test_pred = model.predict(X_test)
