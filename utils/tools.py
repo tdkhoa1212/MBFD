@@ -74,6 +74,17 @@ def scaler_fit(train_signals, opt):
     train_data = scale.transform(train_signals)
     return train_data, scale
 
+def predict_batch(model, data, batch):
+  pred = []
+  for i in range(0, len(data), batch):
+    data_batch = data[i: i+batch]
+    if pred == []:
+      pred = model.predict(data_batch)
+    else:
+      pred = np.concatenate((pred, model.predict(data_batch)))
+  return pred
+
+
 def ML_models(X_train, y_train, X_test, y_test, ML_method, get_pred=False):
     '''
     X_train, X_test: matrices
@@ -86,10 +97,11 @@ def ML_models(X_train, y_train, X_test, y_test, ML_method, get_pred=False):
     if ML_method == 'KNN':     
       model = KNeighborsClassifier()
     if ML_method == 'LGBM':
-      model = LGBMClassifier(early_stopping_round <= 0)
+      model = LGBMClassifier(num_iteration = 10)
     
     model.fit(X_train, y_train)
-    y_test_pred = model.predict(X_test)
+    print("test model-----------------------")
+    y_test_pred = predict_batch(model, X_test, 20)
     if get_pred:
       return y_test_pred
     print(f"\nTEST ACCURACY: {accuracy_score(y_test, y_test_pred)}\n")
