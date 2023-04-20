@@ -232,7 +232,7 @@ def train_table_9(opt):
             emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
             X_train_embed, X_test_embed = emb_sys.get_emb()
 
-            y_pred_all = np.zeros((X_test_embed.shape[0], np.max(y_train) + 1))
+            y_pred_all = np.zeros((X_test_embed.shape[0], ))
             l = 0
             for each_ML in ['SVM', 'RF', 'KNN', 'euclidean', 'cosine']:
                 l += 1
@@ -240,7 +240,7 @@ def train_table_9(opt):
                 y_pred = emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False, get_pred=True)
                 print(f"Shape of the prediction: {y_pred.shape}")
                 
-                y_pred_all += y_pred
+                y_pred_all += np.array(y_pred)
                 acc = accuracy_score(y_pred, y_test)
                 if each_ML == 'SVM':
                     emb_accuracy_SVM.append(acc)
@@ -255,8 +255,8 @@ def train_table_9(opt):
 
                 print(f'\n--------------Test accuracy: {acc} with the {each_ML} method--------------')
 
-            y_pred_all = y_pred_all.astype(np.float32) / l
-            y_pred_all = np.argmax(y_pred_all, axis=1)
+            y_pred_all = y_pred_all / l
+            y_pred_all = np.rint(y_pred_all)
             acc_all = accuracy_score(y_test, y_pred_all)
             emb_accuracy_ensemble.append(acc_all)
 
