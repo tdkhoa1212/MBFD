@@ -238,6 +238,7 @@ def train_table_9(opt):
                 l += 1
                 tf.keras.backend.clear_session()
                 y_pred = emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False, get_pred=True)
+                print(f"Shape of the prediction: {y_pred.shape}")
                 
                 y_pred_all += y_pred
                 acc = accuracy_score(y_pred, y_test)
