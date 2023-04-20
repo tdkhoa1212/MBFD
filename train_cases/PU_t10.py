@@ -12,6 +12,7 @@ from os.path import join, exists
 from sklearn.metrics import accuracy_score
 import warnings
 from NN_system.main_system import train_main_system
+import shutil
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 np.seterr(all="ignore")
@@ -40,7 +41,7 @@ def train_table_9(opt):
     # Delete the previous weight file
     path = join(opt.weights_path, "main_SDLM")
     if exists(path):
-        os.rmdir(path)
+        shutil.rmtree(path, ignore_errors=False, onerror=None)
 
     if exists(join(opt.path_saved_data, 'Healthy.npy')):
       Healthy = np.load(join(opt.path_saved_data, 'Healthy.npy'), allow_pickle=True) 
