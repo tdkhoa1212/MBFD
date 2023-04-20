@@ -36,6 +36,11 @@ def get_list(data, lis):
 def train_table_9(opt):
     case_0 = False 
     case_1 = True 
+    
+    # Delete the previous weight file
+    path = join(opt.weights_path, "main_SDLM")
+    if exists(path):
+        os.rmdir(path)
 
     if exists(join(opt.path_saved_data, 'Healthy.npy')):
       Healthy = np.load(join(opt.path_saved_data, 'Healthy.npy'), allow_pickle=True) 
@@ -138,8 +143,6 @@ def train_table_9(opt):
                     emb_accuracy_RF.append(acc)
                 elif each_ML == 'KNN':
                     emb_accuracy_KNN.append(acc)
-                elif each_ML == 'LGBM':
-                    emb_accuracy_LGBM.append(acc)
                 elif each_ML == 'euclidean':
                     emb_accuracy_euclidean.append(acc)
                 elif each_ML == 'cosine':
@@ -238,7 +241,7 @@ def train_table_9(opt):
                 l += 1
                 tf.keras.backend.clear_session()
                 y_pred = emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False, get_pred=True)
-                print(f"Shape of the prediction: {y_pred.shape}")
+                print(f"Shape of the prediction: {np.array(y_pred).shape}")
                 
                 y_pred_all += np.array(y_pred)
                 acc = accuracy_score(y_pred, y_test)
