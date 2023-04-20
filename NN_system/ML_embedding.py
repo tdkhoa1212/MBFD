@@ -2,7 +2,7 @@ from scipy.spatial.distance import cosine, euclidean
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import accuracy_score
-from utils.tools import ML_models, scaler_fit, scale_test, scaler_tripdata
+from utils.tools import ML_models, scale_test, one_hot
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 
 
@@ -11,8 +11,8 @@ class FaceNetOneShotRecognitor(object):
     def __init__(self, X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt):
         self.opt = opt
         self.scale_1, self.scale_2 = scale_1, scale_2
-        self.X_train, self.y_train = X_train, y_train
-        self.X_test, self.y_test   = X_test, y_test
+        self.X_train, self.y_train = X_train, one_hot(y_train)
+        self.X_test, self.y_test   = X_test, one_hot(y_test)
         self.model = model
 
     def get_emb(self):

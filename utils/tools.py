@@ -102,7 +102,6 @@ def ML_models(X_train, y_train, X_test, y_test, ML_method, get_pred=False):
                              n_jobs=4, n_estimators=5000, class_weight='balanced'))
     
     model.fit(X_train, y_train)
-    print("test model-----------------------")
     y_test_pred = predict_batch(model, X_test, 20)
     if get_pred:
       return y_test_pred

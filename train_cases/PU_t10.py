@@ -4,7 +4,6 @@ from utils.tools import load_table_10_spe,\
                         plot_confusion, scaler_fit
 
 from itertools import combinations
-from sklearn.utils import shuffle
 from NN_system.main_system import train_main_system
 import tensorflow as tf
 import numpy as np
@@ -68,7 +67,6 @@ def train_table_9(opt):
     emb_accuracy_SVM = []
     emb_accuracy_RF = []
     emb_accuracy_KNN = []
-    emb_accuracy_LGBM = []
     emb_accuracy_euclidean = []
     emb_accuracy_cosine = []
 
@@ -234,14 +232,14 @@ def train_table_9(opt):
             emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
             X_train_embed, X_test_embed = emb_sys.get_emb()
 
-            y_pred_all = []
+            y_pred_all = np.zeros((X_test_embed.shape[0], np.max(y_train) + 1))
             l = 0
-            for each_ML in ['SVM', 'RF', 'KNN', 'LGBM', 'euclidean', 'cosine']:
+            for each_ML in ['SVM', 'RF', 'KNN', 'euclidean', 'cosine']:
                 l += 1
                 tf.keras.backend.clear_session()
                 y_pred = emb_sys.predict(X_test_embed, X_train_embed, ML_method=each_ML, use_mean_var=False, get_pred=True)
                 
-                y_pred_all.append(y_pred)
+                y_pred_all += y_pred
                 acc = accuracy_score(y_pred, y_test)
                 if each_ML == 'SVM':
                     emb_accuracy_SVM.append(acc)
@@ -249,8 +247,6 @@ def train_table_9(opt):
                     emb_accuracy_RF.append(acc)
                 elif each_ML == 'KNN':
                     emb_accuracy_KNN.append(acc)
-                elif each_ML == 'LGBM':
-                    emb_accuracy_LGBM.append(acc)
                 elif each_ML == 'euclidean':
                     emb_accuracy_euclidean.append(acc)
                 elif each_ML == 'cosine':
@@ -272,7 +268,6 @@ def train_table_9(opt):
     print(color.CYAN + f'Test accuracy: {np.mean(emb_accuracy_SVM)} with SVM' + color.END)
     print(color.CYAN + f'Test accuracy: {np.mean(emb_accuracy_RF)} with RF' + color.END)
     print(color.CYAN + f'Test accuracy: {np.mean(emb_accuracy_KNN)} with KNN' + color.END)
-    print(color.CYAN + f'Test accuracy: {np.mean(emb_accuracy_LGBM)} with LGBM' + color.END)
     print(color.CYAN + f'Test accuracy: {np.mean(emb_accuracy_euclidean)} with euclidean' + color.END)
     print(color.CYAN + f'Test accuracy: {np.mean(emb_accuracy_cosine)} with cosine' + color.END)
     print(color.CYAN + f'Test accuracy: {np.mean(emb_accuracy_ensemble)} with ensemble' + color.END)
