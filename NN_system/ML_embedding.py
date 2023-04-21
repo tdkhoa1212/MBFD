@@ -11,8 +11,8 @@ class FaceNetOneShotRecognitor(object):
     def __init__(self, X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt):
         self.opt = opt
         self.scale_1, self.scale_2 = scale_1, scale_2
-        self.X_train, self.y_train = X_train, one_hot(y_train)
-        self.X_test, self.y_test   = X_test, one_hot(y_test)
+        self.X_train, self.y_train = X_train, y_train
+        self.X_test, self.y_test   = X_test, y_test
         self.model = model
 
     def get_emb(self):
