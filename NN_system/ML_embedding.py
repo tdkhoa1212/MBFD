@@ -2,7 +2,7 @@ from scipy.spatial.distance import cosine, euclidean
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import accuracy_score
-from utils.tools import ML_models, scale_test, one_hot
+from utils.tools import ML_models, scale_test, one_hot, scaler_fit
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
 
 
@@ -20,8 +20,11 @@ class FaceNetOneShotRecognitor(object):
         X_tra_e = self.X_train
         X_te_e = self.X_test
         if self.opt.scaler != None:
-            self.X_train = scale_test(self.X_train, self.scale_1)
-            self.X_test = scale_test(self.X_test, self.scale_1)
+            # self.X_train = scale_test(self.X_train, self.scale_1)
+            # self.X_test = scale_test(self.X_test, self.scale_1)
+            
+            self.X_train = scaler_fit(self.X_train, self.opt)
+            self.X_test = scaler_fit(self.X_test, self.opt)
 
         # Extract data--------------------------------------
         if self.opt.Ex_feature == 'time':
@@ -40,8 +43,11 @@ class FaceNetOneShotRecognitor(object):
             X_test_e = np.concatenate((X_test_time_e, X_test_fre_e), axis=-1)
         
         if self.opt.scaler != None:
-            X_train_e = scale_test(X_train_e, self.scale_2)
-            X_test_e = scale_test(X_test_e, self.scale_2)
+            # X_train_e = scale_test(X_train_e, self.scale_2)
+            # X_test_e = scale_test(X_test_e, self.scale_2)
+
+            X_train_e = scaler_fit(X_train_e, self.opt)
+            X_test_e = scaler_fit(X_test_e, self.opt)
      
         if self.opt.model == 'main_model':
             _, X_train_embed = self.model.predict([self.X_train, X_train_e])
