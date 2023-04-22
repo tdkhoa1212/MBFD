@@ -78,11 +78,8 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         n_data_e = X_train_e[:, 2]
 
         if opt.scaler != None:
-            if exists(scaler_1_path):
-                scale_1 = load(open(scaler_1_path, 'rb'))
-            else:
-                a_data_e, p_data_e, n_data_e, scale_1 = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
-                dump(scale_1, open(scaler_1_path, 'wb'))
+            a_data_e, p_data_e, n_data_e, scale_1 = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
+            dump(scale_1, open(scaler_1_path, 'wb'))
 
         # Data of extract branch
         if opt.Ex_feature == 'time':
@@ -109,11 +106,8 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
             e_n_data = np.concatenate((n_time, n_fre), axis=-1)
 
         if opt.scaler != None:
-            if exists(scaler_2_path):
-                scale_2 = load(open(scaler_2_path, 'rb'))
-            else:
-                e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
-                dump(scale_2, open(scaler_2_path, 'wb'))
+            e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
+            dump(scale_2, open(scaler_2_path, 'wb'))
         #-----------------------------------------------
 
         a_label = one_hot(y_train[:, 0])
