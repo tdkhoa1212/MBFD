@@ -54,18 +54,15 @@ class FaceNetOneShotRecognitor(object):
             # X_train_e = scale_test(X_train_e, self.scale_2)
             # X_test_e = scale_test(X_test_e, self.scale_2)
 
-            X_train_e, _ = scaler_fit(X_train_e, self.opt)
-            X_test_e, _ = scaler_fit(X_test_e, self.opt)
-            if exists(join(self.opt.path_saved_data, f'X_train_e{self.opt.scaler}.npy')):
-                X_train_e = np.load(join(self.opt.path_saved_data, f'X_train_e{self.opt.scaler}.npy'), allow_pickle=True)
-                X_test_e = np.load(join(self.opt.path_saved_data, f'X_test_e{self.opt.scaler}.npy'), allow_pickle=True)
+            if exists(join(self.opt.path_saved_data, f'X_train_e_{self.opt.scaler}.npy')):
+                X_train_e = np.load(join(self.opt.path_saved_data, f'X_train_e_{self.opt.scaler}.npy'), allow_pickle=True)
+                X_test_e = np.load(join(self.opt.path_saved_data, f'X_test_e_{self.opt.scaler}.npy'), allow_pickle=True)
             else:
-                X_train_e, _ = scaler_fit(self.X_train, self.opt)
-                X_test_e, _ = scaler_fit(self.X_test, self.opt)
-                with open(join(self.opt.path_saved_data, f'X_train_e{self.opt.scaler}.npy'), 'wb') as f:
+                X_train_e, _ = scaler_fit(X_train_e, self.opt)
+                X_test_e, _ = scaler_fit(X_test_e, self.opt)
+                with open(join(self.opt.path_saved_data, f'X_train_e_{self.opt.scaler}.npy'), 'wb') as f:
                     np.save(f, X_train_e)
-
-                with open(join(self.opt.path_saved_data, f'X_test_e{self.opt.scaler}.npy'), 'wb') as f:
+                with open(join(self.opt.path_saved_data, f'X_test_e_{self.opt.scaler}.npy'), 'wb') as f:
                     np.save(f, X_test_e)
      
         if self.opt.model == 'main_model':
