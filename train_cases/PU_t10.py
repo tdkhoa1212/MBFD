@@ -233,7 +233,7 @@ def train_table_9(opt):
 
             print("\n" + "#"*20 + ' TRAINING PHASE ' + "#"*20 + "\n")
             model = train_main_system(X_train, y_train, X_test, y_test, opt)
-            emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
+            emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, opt)
             X_train_embed, X_test_embed = emb_sys.get_emb()
 
             y_pred_all = np.zeros((X_test_embed.shape[0], ))

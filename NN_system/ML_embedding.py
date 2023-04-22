@@ -8,9 +8,9 @@ from utils.extraction_features import extracted_feature_of_signal, handcrafted_f
 
 
 class FaceNetOneShotRecognitor(object):
-    def __init__(self, X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt):
+    def __init__(self, X_train, y_train, X_test, y_test, model, opt):
         self.opt = opt
-        self.scale_1, self.scale_2 = scale_1, scale_2
+        # self.scale_1, self.scale_2 = scale_1, scale_2
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test   = X_test, y_test
         self.model = model
