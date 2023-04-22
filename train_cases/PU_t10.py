@@ -232,7 +232,7 @@ def train_table_9(opt):
             print('\n'+ '-'*100)
 
             print("\n" + "#"*20 + ' TRAINING PHASE ' + "#"*20 + "\n")
-            model, scale_1, scale_2 = train_main_system(X_train, y_train, X_test, y_test, opt)
+            model = train_main_system(X_train, y_train, X_test, y_test, opt)
             emb_sys = FaceNetOneShotRecognitor(X_train, y_train, X_test, y_test, model, scale_1, scale_2, opt)
             X_train_embed, X_test_embed = emb_sys.get_emb()
 

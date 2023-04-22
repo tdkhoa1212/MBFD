@@ -49,21 +49,6 @@ class FaceNetOneShotRecognitor(object):
             X_test_time_e = extracted_feature_of_signal(X_te_e)
             X_test_fre_e = handcrafted_features(X_te_e)
             X_test_e = np.concatenate((X_test_time_e, X_test_fre_e), axis=-1)
-        
-        if self.opt.scaler != None:
-            # X_train_e = scale_test(X_train_e, self.scale_2)
-            # X_test_e = scale_test(X_test_e, self.scale_2)
-
-            if exists(join(self.opt.path_saved_data, f'X_train_e_{self.opt.scaler}.npy')):
-                X_train_e = np.load(join(self.opt.path_saved_data, f'X_train_e_{self.opt.scaler}.npy'), allow_pickle=True)
-                X_test_e = np.load(join(self.opt.path_saved_data, f'X_test_e_{self.opt.scaler}.npy'), allow_pickle=True)
-            else:
-                X_train_e, _ = scaler_fit(X_train_e, self.opt)
-                X_test_e, _ = scaler_fit(X_test_e, self.opt)
-                with open(join(self.opt.path_saved_data, f'X_train_e_{self.opt.scaler}.npy'), 'wb') as f:
-                    np.save(f, X_train_e)
-                with open(join(self.opt.path_saved_data, f'X_test_e_{self.opt.scaler}.npy'), 'wb') as f:
-                    np.save(f, X_test_e)
      
         if self.opt.model == 'main_model':
             _, X_train_embed = self.model.predict([self.X_train, X_train_e])

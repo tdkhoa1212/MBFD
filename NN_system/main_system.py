@@ -59,98 +59,89 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     scaler_1_path = join(opt.path_saved_data, f'/{opt.scaler}_scale_1.pkl')
     scaler_2_path = join(opt.path_saved_data, f'/{opt.scaler}_scale_2.pkl')
 
-    if opt.train_mode:
-        # ------------------------------------- GENERATE DATA ---------------------------------------------------------
-        # # Expand 1 channel for data ------------------------------
-        # X_train = np.expand_dims(X_train, axis=-1)
-        # X_test = np.expand_dims(X_test, axis=-1)
+    # ------------------------------------- GENERATE DATA ---------------------------------------------------------
+    # Data of main branch
+    X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
+    X_train_e =  X_train
 
-        # Data of main branch
-        X_train, y_train = generate_triplet(X_train, y_train)  #(anchors, positive, negative)
-        X_train_e =  X_train
+    a_data = X_train[:, 0].reshape(-1, opt.input_shape, 1)
+    p_data = X_train[:, 1].reshape(-1, opt.input_shape, 1)
+    n_data = X_train[:, 2].reshape(-1, opt.input_shape, 1)
 
-        a_data = X_train[:, 0].reshape(-1, opt.input_shape, 1)
-        p_data = X_train[:, 1].reshape(-1, opt.input_shape, 1)
-        n_data = X_train[:, 2].reshape(-1, opt.input_shape, 1)
+    a_data_e = X_train_e[:, 0]
+    p_data_e = X_train_e[:, 1]
+    n_data_e = X_train_e[:, 2]
 
-        a_data_e = X_train_e[:, 0]
-        p_data_e = X_train_e[:, 1]
-        n_data_e = X_train_e[:, 2]
+    if opt.scaler != None:
+        a_data_e, p_data_e, n_data_e, _ = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
 
-        if opt.scaler != None:
-            a_data_e, p_data_e, n_data_e, scale_1 = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
-            dump(scale_1, open(scaler_1_path, 'wb'))
+    # Data of extract branch
+    if opt.Ex_feature == 'time':
+        e_a_data = extracted_feature_of_signal(np.squeeze(a_data))
+        e_p_data = extracted_feature_of_signal(np.squeeze(p_data))
+        e_n_data = extracted_feature_of_signal(np.squeeze(n_data))
 
-        # Data of extract branch
-        if opt.Ex_feature == 'time':
-            e_a_data = extracted_feature_of_signal(np.squeeze(a_data))
-            e_p_data = extracted_feature_of_signal(np.squeeze(p_data))
-            e_n_data = extracted_feature_of_signal(np.squeeze(n_data))
+    if opt.Ex_feature == 'fre':
+        e_a_data = handcrafted_features(np.squeeze(a_data))
+        e_p_data = handcrafted_features(np.squeeze(p_data))
+        e_n_data = handcrafted_features(np.squeeze(n_data))
 
-        if opt.Ex_feature == 'fre':
-            e_a_data = handcrafted_features(np.squeeze(a_data))
-            e_p_data = handcrafted_features(np.squeeze(p_data))
-            e_n_data = handcrafted_features(np.squeeze(n_data))
+    if opt.Ex_feature == 'time_fre':
+        a_time   = extracted_feature_of_signal(np.squeeze(a_data))
+        p_time   = extracted_feature_of_signal(np.squeeze(p_data))
+        n_time   = extracted_feature_of_signal(np.squeeze(n_data))
 
-        if opt.Ex_feature == 'time_fre':
-            a_time   = extracted_feature_of_signal(np.squeeze(a_data))
-            p_time   = extracted_feature_of_signal(np.squeeze(p_data))
-            n_time   = extracted_feature_of_signal(np.squeeze(n_data))
+        a_fre   = handcrafted_features(np.squeeze(a_data))
+        p_fre   = handcrafted_features(np.squeeze(p_data))
+        n_fre   = handcrafted_features(np.squeeze(n_data))
 
-            a_fre   = handcrafted_features(np.squeeze(a_data))
-            p_fre   = handcrafted_features(np.squeeze(p_data))
-            n_fre   = handcrafted_features(np.squeeze(n_data))
+        e_a_data = np.concatenate((a_time, a_fre), axis=-1)
+        e_p_data = np.concatenate((p_time, p_fre), axis=-1)
+        e_n_data = np.concatenate((n_time, n_fre), axis=-1)
 
-            e_a_data = np.concatenate((a_time, a_fre), axis=-1)
-            e_p_data = np.concatenate((p_time, p_fre), axis=-1)
-            e_n_data = np.concatenate((n_time, n_fre), axis=-1)
+    # if opt.scaler != None:
+    #     e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
+    #     dump(scale_2, open(scaler_2_path, 'wb'))
+    #-----------------------------------------------
 
-        if opt.scaler != None:
-            e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
-            dump(scale_2, open(scaler_2_path, 'wb'))
-        #-----------------------------------------------
+    a_label = one_hot(y_train[:, 0])
+    p_label = one_hot(y_train[:, 1])
+    n_label = one_hot(y_train[:, 2])
+    c_data   = y_train[:, 1]
 
-        a_label = one_hot(y_train[:, 0])
-        p_label = one_hot(y_train[:, 1])
-        n_label = one_hot(y_train[:, 2])
-        c_data   = y_train[:, 1]
+    t_soft = np.concatenate((a_label, p_label, n_label), -1)
 
-        t_soft = np.concatenate((a_label, p_label, n_label), -1)
+    model = Model(inputs=[a_i, e_i_1, p_i, e_i_2, n_i, e_i_3, c_i], outputs=[m_soft, m_logit])
+    model.summary()
+    if opt.load_weights:
+        if isdir(path):
+            model.load_weights(path)
+            print(f'\n Load weight : {path}')
+        else:
+            print('\n No weight file.')
 
-        model = Model(inputs=[a_i, e_i_1, p_i, e_i_2, n_i, e_i_3, c_i], outputs=[m_soft, m_logit])
-        model.summary()
-        if opt.load_weights:
-            if isdir(path):
-                model.load_weights(path)
-                print(f'\n Load weight : {path}')
-            else:
-                print('\n No weight file.')
+    model.compile(loss=["categorical_crossentropy",
+                new_triplet_loss],
+                optimizer=tf.keras.optimizers.experimental.Adagrad(),
+                # tf.keras.optimizers.experimental.RMSprop(), 
+                metrics=["accuracy"], 
+                loss_weights=loss_weights)
 
-        model.compile(loss=["categorical_crossentropy",
-                    new_triplet_loss],
-                    optimizer=tf.keras.optimizers.experimental.Adagrad(),
-                    # tf.keras.optimizers.experimental.RMSprop(), 
-                    metrics=["accuracy"], 
-                    loss_weights=loss_weights)
+    # Note:
+    # y=[t_soft, c_data] c_data is just for afternative position for blank position
+    # only use t_soft for softmax head in training process
+    model.fit(x = [a_data_e, e_a_data, p_data_e, e_p_data, n_data_e, e_n_data, c_data], 
+                y = [t_soft, c_data],
+                batch_size=opt.batch_size, 
+                epochs=opt.epochs, 
+            #   callbacks=[callback], 
+                shuffle=True)
 
-        # Note:
-        # y=[t_soft, c_data] c_data is just for afternative position for blank position
-        # only use t_soft for softmax head in training process
-        model.fit(x = [a_data_e, e_a_data, p_data_e, e_p_data, n_data_e, e_n_data, c_data], 
-                  y = [t_soft, c_data],
-                  batch_size=opt.batch_size, 
-                  epochs=opt.epochs, 
-                #   callbacks=[callback], 
-                  shuffle=True)
-
-        save(model, path)
-    else:
-        scale_1 = load(scaler_1_path, 'rb')
-        scale_2 = load(scaler_2_path, 'rb')
+    save(model, path)
     # ------------------------------------- TEST MODEL ---------------------------------------------------------
     model = Model(inputs=[a_i, e_i_1], outputs=[soft_a, logits_a])
     model.load_weights(path)
-    return model, scale_1, scale_2
+    return model
 
 def train_S_SDLM_system(X_train, y_train, X_test, y_test, opt):
     if opt.scaler != None:
