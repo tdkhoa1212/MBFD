@@ -11,8 +11,7 @@ from tensorflow.saved_model import save
 import numpy as np
 import tensorflow as tf
 from utils.angular_grad import AngularGrad
-from pickle import dump, load
-from os.path import exists
+from pickle import Sload
 
 
 def train_main_system(X_train, y_train, X_test, y_test, opt):   
@@ -78,12 +77,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         n_data_e = X_train_e[:, 2]
 
         if opt.scaler != None:
-            if exists(scaler_1_path):
-                scale_1 = load(open(scaler_1_path, 'rb'))
-            else:
-                a_data_e, p_data_e, n_data_e, scale_1 = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
-                X_test = scale_test(X_test, scale_1)
-                dump(scale_1, open(scaler_1_path, 'wb'))
+            a_data_e, p_data_e, n_data_e, scale_1 = scaler_tripdata(a_data_e, p_data_e, n_data_e, opt)
 
         # Data of extract branch
         if opt.Ex_feature == 'time':
@@ -110,11 +104,8 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
             e_n_data = np.concatenate((n_time, n_fre), axis=-1)
 
         if opt.scaler != None:
-            if exists(scaler_2_path):
-                scale_2 = load(open(scaler_2_path, 'rb'))
-            else:
-                e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
-                dump(scale_2, open(scaler_2_path, 'wb'))
+            e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
+        
         #-----------------------------------------------
 
         a_label = one_hot(y_train[:, 0])
@@ -143,7 +134,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
         # Note:
         # y=[t_soft, c_data] c_data is just for afternative position for blank position
         # only use t_soft for softmax head in training process
-        model.fit(x = [a_data, e_a_data, p_data, e_p_data, n_data, e_n_data, c_data], 
+        model.fit(x = [a_data_e, e_a_data, p_data_e, e_p_data, n_data_e, e_n_data, c_data], 
                   y = [t_soft, c_data],
                   batch_size=opt.batch_size, 
                   epochs=opt.epochs, 

@@ -1,5 +1,5 @@
 from scipy.spatial.distance import cosine, euclidean
-from tqdm import tqdm
+from os.path import exists, join
 import numpy as np
 from sklearn.metrics import accuracy_score
 from utils.tools import ML_models, scale_test, one_hot, scaler_fit
@@ -22,9 +22,17 @@ class FaceNetOneShotRecognitor(object):
         if self.opt.scaler != None:
             # self.X_train = scale_test(self.X_train, self.scale_1)
             # self.X_test = scale_test(self.X_test, self.scale_1)
-            
-            self.X_train, _ = scaler_fit(self.X_train, self.opt)
-            self.X_test, _ = scaler_fit(self.X_test, self.opt)
+            if exists(join(self.opt.path_saved_data, f'X_train_{self.opt.scaler}.npy')):
+                self.X_train = np.load(join(self.opt.path_saved_data, f'X_train_{self.opt.scaler}.npy'), allow_pickle=True)
+                self.X_test = np.load(join(self.opt.path_saved_data, f'X_test_{self.opt.scaler}.npy'), allow_pickle=True)
+            else:
+                self.X_train, _ = scaler_fit(self.X_train, self.opt)
+                self.X_test, _ = scaler_fit(self.X_test, self.opt)
+                with open(join(self.opt.path_saved_data, f'X_train_{self.opt.scaler}.npy'), 'wb') as f:
+                    np.save(f, self.X_train)
+
+                with open(join(self.opt.path_saved_data, f'X_test_{self.opt.scaler}.npy'), 'wb') as f:
+                    np.save(f, self.X_test)
 
         # Extract data--------------------------------------
         if self.opt.Ex_feature == 'time':
@@ -48,6 +56,17 @@ class FaceNetOneShotRecognitor(object):
 
             X_train_e, _ = scaler_fit(X_train_e, self.opt)
             X_test_e, _ = scaler_fit(X_test_e, self.opt)
+            if exists(join(self.opt.path_saved_data, f'X_train_e{self.opt.scaler}.npy')):
+                X_train_e = np.load(join(self.opt.path_saved_data, f'X_train_e{self.opt.scaler}.npy'), allow_pickle=True)
+                X_test_e = np.load(join(self.opt.path_saved_data, f'X_test_e{self.opt.scaler}.npy'), allow_pickle=True)
+            else:
+                X_train_e, _ = scaler_fit(self.X_train, self.opt)
+                X_test_e, _ = scaler_fit(self.X_test, self.opt)
+                with open(join(self.opt.path_saved_data, f'X_train_e{self.opt.scaler}.npy'), 'wb') as f:
+                    np.save(f, X_train_e)
+
+                with open(join(self.opt.path_saved_data, f'X_test_e{self.opt.scaler}.npy'), 'wb') as f:
+                    np.save(f, X_test_e)
      
         if self.opt.model == 'main_model':
             _, X_train_embed = self.model.predict([self.X_train, X_train_e])
