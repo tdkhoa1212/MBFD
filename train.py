@@ -26,7 +26,7 @@ def parse_opt(known=False):
     parser.add_argument('--input_shape', default=255990, type=int)  
     parser.add_argument('--num_classes', default=3, type=int) 
     parser.add_argument('--batch_size', default=16, type=int) 
-    parser.add_argument('--epochs', default=100, type=int) 
+    parser.add_argument('--epochs', default=30, type=int) 
     parser.add_argument('--train_mode', default=True, type=bool)
     parser.add_argument('--get_SDLM_extract', default=False, type=bool)
     parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
