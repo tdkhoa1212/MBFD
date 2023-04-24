@@ -10,7 +10,6 @@ from utils.extraction_features import extracted_feature_of_signal, handcrafted_f
 class FaceNetOneShotRecognitor(object):
     def __init__(self, X_train, y_train, X_test, y_test, model, opt):
         self.opt = opt
-        # self.scale_1, self.scale_2 = scale_1, scale_2
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test   = X_test, y_test
         self.model = model
@@ -20,19 +19,8 @@ class FaceNetOneShotRecognitor(object):
         X_tra_e = self.X_train
         X_te_e = self.X_test
         if self.opt.scaler != None:
-            # self.X_train = scale_test(self.X_train, self.scale_1)
-            # self.X_test = scale_test(self.X_test, self.scale_1)
-            if exists(join(self.opt.path_saved_data, f'X_train_{self.opt.scaler}.npy')):
-                self.X_train = np.load(join(self.opt.path_saved_data, f'X_train_{self.opt.scaler}.npy'), allow_pickle=True)
-                self.X_test = np.load(join(self.opt.path_saved_data, f'X_test_{self.opt.scaler}.npy'), allow_pickle=True)
-            else:
-                self.X_train, _ = scaler_fit(self.X_train, self.opt)
-                self.X_test, _ = scaler_fit(self.X_test, self.opt)
-                with open(join(self.opt.path_saved_data, f'X_train_{self.opt.scaler}.npy'), 'wb') as f:
-                    np.save(f, self.X_train)
-
-                with open(join(self.opt.path_saved_data, f'X_test_{self.opt.scaler}.npy'), 'wb') as f:
-                    np.save(f, self.X_test)
+            self.X_train, _ = scaler_fit(self.X_train, self.opt)
+            self.X_test, _ = scaler_fit(self.X_test, self.opt)
 
         # Extract data--------------------------------------
         if self.opt.Ex_feature == 'time':
@@ -49,7 +37,7 @@ class FaceNetOneShotRecognitor(object):
             X_test_time_e = extracted_feature_of_signal(X_te_e)
             X_test_fre_e = handcrafted_features(X_te_e)
             X_test_e = np.concatenate((X_test_time_e, X_test_fre_e), axis=-1)
-     
+      
         if self.opt.model == 'main_model':
             _, X_train_embed = self.model.predict([self.X_train, X_train_e])
             _soft_pred, X_test_embed = self.model.predict([self.X_test, X_test_e]) 
