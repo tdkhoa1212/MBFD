@@ -27,7 +27,7 @@ def U_SDLM(input, opt):
   x = Dropout(rate=0.5)(x)
   x = Dense(opt.embedding_size)(x)
   x = BatchNormalization()(x)
-  x = Activation('relu')(x)
-  x = Lambda(lambda  x: K.l2_normalize(x, axis=1))(x)
+  # x = Activation('relu')(x)
+  # x = Lambda(lambda  x: K.l2_normalize(x, axis=1))(x)
   return x
 
