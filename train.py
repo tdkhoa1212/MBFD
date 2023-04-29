@@ -14,7 +14,7 @@ def parse_opt(known=False):
     parser.add_argument('--weights_path', type=str, default='/content/drive/MyDrive/Khoa/results/', help='direction of data')
     parser.add_argument('--img_outdir', type=str, default='/content/drive/MyDrive/Khoa/results/images/', help='direction of data')
     parser.add_argument('--load_weights', default=False, type=bool)
-    parser.add_argument('--Ex_feature', type=str, default='fre', help='time, fre, time_fre')
+    parser.add_argument('--Ex_feature', type=str, default='time', help='time, fre, time_fre')
 
     # Data------------------------------------
     parser.add_argument('--PU_table_8', default=False, type=bool)
@@ -25,12 +25,12 @@ def parse_opt(known=False):
     # Parameters--------
     parser.add_argument('--alpha', default=0.4, type=int)
     parser.add_argument('--lambda_', default=0.3, type=int)
-    parser.add_argument('--embedding_size', default=256, type=int)
-    parser.add_argument('--e_input_shape', default=15, type=int, help='11, 16, 6270, 6400') 
+    parser.add_argument('--embedding_size', default=128, type=int)
+    parser.add_argument('--e_input_shape', default=11, type=int, help='11, 16, 6270, 6400') 
     parser.add_argument('--input_shape', default=400, type=int, help='255990, 400')  
     parser.add_argument('--num_classes', default=45, type=int) 
     parser.add_argument('--batch_size', default=16, type=int) 
-    parser.add_argument('--epochs', default=300, type=int) 
+    parser.add_argument('--epochs', default=50, type=int) 
     parser.add_argument('--train_mode', default=True, type=bool)
     parser.add_argument('--get_SDLM_extract', default=False, type=bool)
     parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
