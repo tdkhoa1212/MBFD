@@ -103,8 +103,8 @@ def S_SDLM(input_, num_classes, opt):
     x = Dense(opt.embedding_size)(x)
     x = BatchNormalization()(x)
     # x = Activation('relu')(x) # no first
-    logit = x 
-    # logit = Lambda(lambda x: K.l2_normalize(x, axis=1))(x)
+    # logit = x 
+    logit = Lambda(lambda x: K.l2_normalize(x, axis=1))(x)
     softmax = Dense(num_classes, activation='softmax')(x)
     
     return softmax, logit
