@@ -7,7 +7,7 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
     
     # Models and denoising methods--------------------------
-    parser.add_argument('--ML_method', default=['RF', 'KNN', 'LGBM', 'euclidean', 'cosine', 'SVM']  , type=list, help='SVM, RF, KNN, euclidean, cosine')
+    parser.add_argument('--ML_method', default=['RF', 'KNN', 'euclidean', 'cosine', 'SVM']  , type=list, help='SVM, RF, KNN, euclidean, cosine')
     parser.add_argument('--scaler', default="PowerTransformer", type=str, help='MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer')
     parser.add_argument('--type_data', type=str, default='vibration', help='vibration, MCS1, MCS2')
     parser.add_argument('--data_dir', type=str, default='/content/drive/MyDrive/Khoa/data_new/data/CWRU_data/', help='direction of data')
@@ -30,7 +30,7 @@ def parse_opt(known=False):
     parser.add_argument('--input_shape', default=400, type=int, help='255990, 400')  
     parser.add_argument('--num_classes', default=45, type=int) 
     parser.add_argument('--batch_size', default=16, type=int) 
-    parser.add_argument('--epochs', default=30, type=int) 
+    parser.add_argument('--epochs', default=300, type=int) 
     parser.add_argument('--train_mode', default=True, type=bool)
     parser.add_argument('--get_SDLM_extract', default=False, type=bool)
     parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
