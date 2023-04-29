@@ -25,7 +25,7 @@ def parse_opt(known=False):
     # Parameters--------
     parser.add_argument('--alpha', default=0.4, type=int)
     parser.add_argument('--lambda_', default=0.3, type=int)
-    parser.add_argument('--embedding_size', default=128, type=int)
+    parser.add_argument('--embedding_size', default=64, type=int)
     parser.add_argument('--e_input_shape', default=11, type=int, help='11, 16, 6270, 6400') 
     parser.add_argument('--input_shape', default=400, type=int, help='255990, 400')  
     parser.add_argument('--num_classes', default=45, type=int) 
