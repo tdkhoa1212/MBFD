@@ -170,8 +170,7 @@ def load_table_10_spe(data, label):
       new_label = np.concatenate((new_label, each_label))
   return np.array(new_data), np.array(new_label)
 
-def one_hot(label):
-  n_class = np.max(label) + 1
+def one_hot_convert(label, n_class):
   new_label = np.zeros((len(label), n_class))
   for idx, val in enumerate(label):
     new_label[idx, val] = 1

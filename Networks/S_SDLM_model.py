@@ -62,7 +62,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = Activation('relu')(x)
     return x
 
-def S_SDLM(input_, opt):
+def S_SDLM(input_, num_classes, opt):
     '''
     The model was rebuilt based on the construction of resnet 34 and inherited from this source code:
     https://github.com/philipperemy/very-deep-convnets-raw-waveforms/blob/master/model_resnet.py
@@ -77,13 +77,21 @@ def S_SDLM(input_, opt):
     x = Activation('relu')(x)
     x = MaxPooling1D(pool_size=4, strides=None)(x)
 
-    for i in range(4):
-        x = identity_block(x, kernel_size=3, filters=48, stage=1, block=i)
+    if opt.table == 'table_10_11_12':
+        for i in range(2):
+            x = identity_block(x, kernel_size=3, filters=48, stage=1, block=i)
         x = MaxPooling1D(pool_size=4, strides=None)(x)
-        
-    for i in range(3):
-        x = identity_block(x, kernel_size=3, filters=96, stage=2, block=i)  
-    x = MaxPooling1D(pool_size=4, strides=None)(x)
+        for i in range(2):
+            x = identity_block(x, kernel_size=3, filters=96, stage=2, block=i)
+        x = MaxPooling1D(pool_size=4, strides=None)(x)
+    else:
+        for i in range(4):
+            x = identity_block(x, kernel_size=3, filters=48, stage=1, block=i)
+            x = MaxPooling1D(pool_size=4, strides=None)(x)
+            
+        for i in range(3):
+            x = identity_block(x, kernel_size=3, filters=96, stage=2, block=i)  
+        x = MaxPooling1D(pool_size=4, strides=None)(x)
       
     x = GlobalAveragePooling1D()(x)
 
@@ -97,6 +105,6 @@ def S_SDLM(input_, opt):
     # x = Activation('relu')(x) # no first
     logit = x 
     # logit = Lambda(lambda x: K.l2_normalize(x, axis=1))(x)
-    softmax = Dense(opt.num_classes, activation='softmax')(x)
+    softmax = Dense(num_classes, activation='softmax')(x)
     
     return softmax, logit

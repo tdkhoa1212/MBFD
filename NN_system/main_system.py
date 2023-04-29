@@ -4,7 +4,7 @@ from Networks.S_SDLM_model import S_SDLM
 from Networks.U_SDLM_model import U_SDLM
 from utils.triplet import new_triplet_loss, generate_triplet, triplet_loss
 from utils.extraction_features import extracted_feature_of_signal, handcrafted_features
-from utils.tools import one_hot, scaler_fit, scale_test, scaler_tripdata
+from utils.tools import one_hot_convert, scaler_fit, scale_test, scaler_tripdata
 from os.path import isdir, join
 from tensorflow.keras.models import Model
 from tensorflow.saved_model import save
@@ -16,6 +16,9 @@ from os.path import exists
 
 
 def train_main_system(X_train, y_train, X_test, y_test, opt):   
+    n_class = np.max(y_train) + 1
+    print("\nnum_classes: ", n_class)
+
     # Extract model ---------------------------------------------------------
     e_i_1 = Input((opt.e_input_shape, ), name='extracting_input_1')
     e_o_1  = U_SDLM(e_i_1, opt)
@@ -40,7 +43,7 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
 
     # Triplet model----------------------------------------------------------
     t_i = Input(shape=(opt.input_shape, 1), name='Triplet_model')
-    softmax, logits = S_SDLM(t_i, opt)
+    softmax, logits = S_SDLM(t_i, n_class, opt)
     t_model = Model(inputs=[t_i], outputs=[softmax, logits])
   
     a_i = Input((opt.input_shape, 1), name='anchor_input')
@@ -101,10 +104,9 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     #     e_a_data, e_p_data, e_n_data, scale_2 = scaler_tripdata(e_a_data, e_p_data, e_n_data, opt)
     #     dump(scale_2, open(scaler_2_path, 'wb'))
     #-----------------------------------------------
-
-    a_label = one_hot(y_train[:, 0])
-    p_label = one_hot(y_train[:, 1])
-    n_label = one_hot(y_train[:, 2])
+    a_label = one_hot_convert(y_train[:, 0], n_class)
+    p_label = one_hot_convert(y_train[:, 1], n_class)
+    n_label = one_hot_convert(y_train[:, 2], n_class)
     c_data   = y_train[:, 1]
 
     t_soft = np.concatenate((a_label, p_label, n_label), -1)
