@@ -7,6 +7,7 @@ import scipy.io
 import tensorflow as tf
 from os.path import join
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
 # ----------------------------------------------------Scaler methods----------------------------------------------------
 from sklearn.preprocessing import MinMaxScaler
@@ -195,4 +196,57 @@ def plot_confusion(y_test, y_pred_inv, outdir, each_ML):
    plt.ylabel('Label')
    plt.savefig(os.path.join(outdir, each_ML))
    plt.show()
-    
+
+def divide_sample(x=None, window_length=400, hop_length=200):
+  '''
+  The shape of x must be (n_sample, )
+  '''
+  if len(x.shape) > 1:
+    x = x.reshape(-1, )
+  a = []
+  window = 0
+  all_hop_length = 0
+  num_window = (x.shape[0]-(window_length-hop_length))//hop_length
+  while window < num_window:
+    if len(x[all_hop_length: all_hop_length+window_length])==window_length:
+      a.append(x[all_hop_length: all_hop_length+window_length])
+    all_hop_length += hop_length
+    window += 1
+  return np.array(a)
+
+def concatenate_data(x=None, window_length=400, hop_length=200, hand_fea=True, SNdb=10):
+  X_train_all = []
+  X_test = []
+  for idx, i in enumerate(x):
+    if len(x[i]) > 80:
+      if X_train_all == []:
+        data = x[i].reshape(-1, 1)
+        X_train_all, X_test = train_test_split(data, test_size=0.2, random_state=42, shuffle=False)
+      else:
+        data = x[i].reshape(-1, 1)
+        each_X_train_all, each_X_test = train_test_split(data, test_size=0.2, random_state=42, shuffle=False)
+
+        X_train_all = np.concatenate((X_train_all, each_X_train_all), axis=0)
+        X_test = np.concatenate((X_test, each_X_test), axis=0)
+  
+  X_train_all = divide_sample(X_train_all, window_length, hop_length)
+  X_test = divide_sample(X_test, window_length, hop_length)
+  
+  return X_train_all, X_test
+
+def one_hot(pos, num_class):
+    num = np.zeros((1, num_class))
+    num[0, pos] = 1
+    return num
+
+def convert_one_hot(x, state=True):
+    if state == False:
+      index = None
+      x = np.squeeze(x)
+
+      for idx, i in enumerate(x):
+        if i == 1:
+          index = idx
+      return [index]
+    else:
+      return x.tolist()
