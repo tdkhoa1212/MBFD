@@ -19,7 +19,6 @@ def parse_opt(known=False):
     # Data------------------------------------
     parser.add_argument('--PU_table_8', default=False, type=bool)
     parser.add_argument('--PU_table_10', default=False, type=bool)
-    parser.add_argument('--CWRU', default=True, type=bool)
     parser.add_argument('--CWRU_case', default="1", type=str, help="1, 2, 3, 4")
     parser.add_argument('--path_saved_data', type=str, default='/content/drive/MyDrive/Khoa/results/saved_data/', help='direction of data')
 
@@ -37,7 +36,7 @@ def parse_opt(known=False):
     parser.add_argument('--TSNE_plot', default=False, type=bool) # get_SDLM_extract
     
     # Mode-------
-    parser.add_argument('--table', type=str, default='table_9', help='table_6, table_7, table_9')
+    parser.add_argument('--table', type=str, default='table_10_11_12', help='table_6, table_7, table_9')
     parser.add_argument('--model', type=str, default='main_model', help='main_model, SDLM, S_SDLM, U_SDLM')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -52,6 +51,6 @@ if __name__ == '__main__':
         train_table_7(opt)
     if opt.table == 'table_9':
         train_table_9(opt)
-    if opt.CWRU:
+    if opt.table == 'table_10_11_12':
         train_table_10_11_12(opt)
         
