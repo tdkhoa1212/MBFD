@@ -289,7 +289,7 @@ def train_U_SDLM_system(X_train, y_train, X_test, y_test, opt):
                 print('\n No weight file.')
 
         model.compile(loss=triplet_loss,
-                    optimizer=tf.keras.optimizers.experimental.RMSprop(), 
+                    optimizer=tf.keras.optimizers.experimental.Adam(), 
                     metrics=["accuracy"])
 
         # Note:
