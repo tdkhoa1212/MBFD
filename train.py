@@ -19,7 +19,7 @@ def parse_opt(known=False):
     # Data------------------------------------
     parser.add_argument('--PU_table_8', default=False, type=bool)
     parser.add_argument('--PU_table_10', default=False, type=bool)
-    parser.add_argument('--CWRU', default=False, type=bool)
+    parser.add_argument('--CWRU', default=True, type=bool)
     parser.add_argument('--CWRU_case', default="1", type=str, help="1, 2, 3, 4")
     parser.add_argument('--path_saved_data', type=str, default='/content/drive/MyDrive/Khoa/results/saved_data/', help='direction of data')
 
