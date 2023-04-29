@@ -56,8 +56,6 @@ def train_main_system(X_train, y_train, X_test, y_test, opt):
     
     loss_weights = [1, 0.01]
     path = join(opt.weights_path, "main_SDLM")
-    scaler_1_path = join(opt.path_saved_data, f'/{opt.scaler}_scale_1.pkl')
-    scaler_2_path = join(opt.path_saved_data, f'/{opt.scaler}_scale_2.pkl')
 
     # ------------------------------------- GENERATE DATA ---------------------------------------------------------
     # Data of main branch

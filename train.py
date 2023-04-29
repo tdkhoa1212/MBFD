@@ -1,6 +1,7 @@
 import argparse
 from train_cases.PU_t8 import train_table_6, train_table_7
 from train_cases.PU_t10 import train_table_9
+from train_cases.CWRU_cases import train_table_10_11_12
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -14,8 +15,12 @@ def parse_opt(known=False):
     parser.add_argument('--img_outdir', type=str, default='/content/drive/MyDrive/Khoa/results/images/', help='direction of data')
     parser.add_argument('--load_weights', default=True, type=bool)
     parser.add_argument('--Ex_feature', type=str, default='fre', help='time, fre, time_fre')
+
+    # Data------------------------------------
     parser.add_argument('--PU_table_8', default=False, type=bool)
-    parser.add_argument('--PU_table_10', default=True, type=bool)
+    parser.add_argument('--PU_table_10', default=False, type=bool)
+    parser.add_argument('--CWRU', default=False, type=bool)
+    parser.add_argument('--CWRU_case', default="1", type=str, help="1, 2, 3, 4")
     parser.add_argument('--path_saved_data', type=str, default='/content/drive/MyDrive/Khoa/results/saved_data/', help='direction of data')
 
     # Parameters--------
@@ -47,4 +52,6 @@ if __name__ == '__main__':
         train_table_7(opt)
     if opt.table == 'table_9':
         train_table_9(opt)
+    if opt.CWRU:
+        train_table_10_11_12(opt)
         
